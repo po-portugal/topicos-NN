@@ -17,7 +17,8 @@ class Dataset():
 
     def processors(self,target_dir):
         #process_in  = lambda row:[row[0],[int(r) for r in row[1:3]]]
-        process_in  = lambda row:[load_norm_img(target_dir,row[0]),[int(r) for r in row[1:3]]]
+        #process_in  = lambda row:[load_norm_img(target_dir,row[0]),[int(r) for r in row[1:3]]]
+        process_in  = lambda row:load_norm_img(target_dir,row[0])
         label_to_num = {
                 "king":0,
                 "queen":1,
@@ -28,7 +29,7 @@ class Dataset():
         }
         n = len(label_to_num)
         enc = lambda label:[int(i==label_to_num[label]) for i in range(n,-1,-1)]
-        process_out = lambda row:[enc(row[3]),*[int(r) for r in row[4:]]]
+        process_out = lambda row:enc(row[3])+[int(r) for r in row[4:]]
         
         return process_in,process_out
     
@@ -42,6 +43,9 @@ class Dataset():
         plt.ylabel("frequência")
         plt.xlabel("faixa do atributo")
         plt.show()
+
+    def get_input_output(self):
+        return self.X, self.Y
 
 
 def getInputs(path,preprocess_in,preprocess_out,delim):

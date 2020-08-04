@@ -17,8 +17,8 @@ def get_args():
 def main():
     args = get_args()
 
-    train = Dataset("./images_norm/","train")
-    test  = Dataset("./images_norm/","test")
+    X_train, Y_train = Dataset("./images_norm/","train").get_input_output()
+    #X_test, Y_test  = Dataset("./images_norm/","test").get_input_output()
     pdb.set_trace()
 
 if("__main__" == __name__):
