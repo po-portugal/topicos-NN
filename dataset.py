@@ -1,82 +1,36 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import OneHotEncoder
+import pdb
+import csv
+import os
 
 class Dataset():
-    def __init__(self,X_raw,Y_raw,header=None):
-        self.X, self.Y = X_raw, Y_raw
-        self.header = header
-        if header is not None:
-            self.X_names = self.header[:-1]
-            self.Y_names = self.header[-1:]
+    def __init__(self,path_to_dir,target):
+        labels_file   = os.path.join(path_to_dir,target+"_labels.csv")
+        images_folder = os.path.join(path_to_dir,target)
 
-    def split(self,test_size,val_size,seed):
-        self.test_size = test_size
-        self.val_size = val_size
-        self.train_size_prct = 100*(1.0-val_size-test_size)
+        proc_in, proc_out = self.processors(images_folder)
 
-        X_final_train, self.X_test,Y_final_train,self.Y_test = \
-        train_test_split(self.X,self.Y,test_size=test_size)
-    
-        self.X_train,self.X_val,self.Y_train,self.Y_val = \
-        train_test_split(
-            X_final_train,
-            Y_final_train,
-            test_size=val_size/(1-test_size),
-            random_state=seed)
+        self.X, self.Y,_ = getInputs(labels_file,proc_in,proc_out,',')
 
-        self.test_size  = len(self.X_test)
-        self.train_size = len(self.X_train)
-        self.input_size = len(self.X[0])
-        self.output_size = 1#len(Y[0])
-
-    def normalise(self):
-        self.X_raw, self.Y_raw = self.X, self.Y
-        self.X, self.Y = self.normaliseX(self.X_raw), self.normaliseY(self.Y_raw)
-
-    def normaliseX(self,X):
-        """Normalizar os parâmetros de entrada"""
-    
-        atts = self.getAttributes(X)
-        att_normal = []
-        for att in atts:
-            array = np.array(att)
-            upp,low = np.amax(array),np.amin(array)
-            band = upp - low
-            att_normal.append((array - low)/band)
-            #import pdb; pdb.set_trace()
+    def processors(self,target_dir):
+        #process_in  = lambda row:[row[0],[int(r) for r in row[1:3]]]
+        process_in  = lambda row:[load_norm_img(target_dir,row[0]),[int(r) for r in row[1:3]]]
+        label_to_num = {
+                "king":0,
+                "queen":1,
+                "jack":2,
+                "nine":3,
+                "ten":4,
+                "ace":5,
+        }
+        n = len(label_to_num)
+        enc = lambda label:[int(i==label_to_num[label]) for i in range(n,-1,-1)]
+        process_out = lambda row:[enc(row[3]),*[int(r) for r in row[4:]]]
         
-        return np.array(self.packAttributes(att_normal))
-
-    def normaliseY(self,Y):
-        """Normalizar os parâmetros de entrada"""
-        upp,low = np.amax(Y),np.amin(Y)
-        band = upp - low
-        return (Y - low)/band
-    
-    def getAttributes(self,X):
-        """Separate Input samples into the respective attributes"""
-        return [list(i) for i in zip(*X)]
-    
-    def packAttributes(self,atts):
-        """Undoes getAttributes"""
-        return [list(i) for i in zip(*atts)]
-
-    def analiseFeatures(self):
-        atts = np.array(self.getAttributes(self.X))
-        ind = list(range(0,len(atts)))
-        means = atts.mean(1)
-        stds  = atts.std(1)
-        
-        print("\\toprule")
-        print("\\toprule")
-        print("Índice & Atributo & Média & Desvio padrão \\\\")
-        print("\\midrule")
-        for i,n,m,s in zip(ind,self.X_names,means,stds):
-            print("%s & %s & %.2f & %.3f \\\\"%(i,n,m,s))
-        print("\\bottomrule")
-        print("\\bottomrule")
-        return
+        return process_in,process_out
     
     def analiseSamples(self):
         """ Print Histogram for the output varable"""
@@ -88,3 +42,19 @@ class Dataset():
         plt.ylabel("frequência")
         plt.xlabel("faixa do atributo")
         plt.show()
+
+
+def getInputs(path,preprocess_in,preprocess_out,delim):
+    X,Y = [],[]
+    with open(path) as fd :
+        csvFd = csv.reader(fd,delimiter=delim)
+        header = next(csvFd)
+        for row in csvFd :
+            X.append(preprocess_in(row))
+            Y.append(preprocess_out(row))
+    return X,Y,header
+
+def load_norm_img(folder,filename):
+    base_name, _ = filename.split('.')
+    path_to_file = os.path.join(folder,base_name+".npy")
+    return np.load(path_to_file)

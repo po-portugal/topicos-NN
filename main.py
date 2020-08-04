@@ -1,6 +1,8 @@
 #! /usr/bin/python3
 
 import argparse
+from dataset import Dataset
+import pdb
 
 def get_args():
     parser = argparse.ArgumentParser(description="Main Script for CNN project")
@@ -15,7 +17,9 @@ def get_args():
 def main():
     args = get_args()
 
-    print(args)
+    train = Dataset("./images_norm/","train")
+    test  = Dataset("./images_norm/","test")
+    pdb.set_trace()
 
 if("__main__" == __name__):
     main()
