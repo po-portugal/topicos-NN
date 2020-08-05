@@ -7,71 +7,66 @@ import csv
 import os
 
 class Dataset():
-    def __init__(self,path_to_dir,target,preprocess="basic"):
+    def __init__(self,path_to_dir,target,preprocess="single_card"):
         self.dataset_dir  = path_to_dir
         self.target       = target
-        self.labels_file_path   = os.path.join(self.dataset_dir,self.target+"_labels.csv")
+        self.labels_file_path   = os.path.join(self.dataset_dir,preprocess+"_"+self.target+"_labels.csv")
         self.images_folder = os.path.join(self.dataset_dir,target)
 
-        if preprocess=="basic":
-            proc_in, proc_out = self.processors_basic(self.images_folder)
-        elif preprocess=="basic_original":
-            proc_in, proc_out = self.processors_basic_original(self.images_folder)
-        elif preprocess=="complete":
-            proc_in, proc_out = self.processors_complete(self.images_folder)
-        elif preprocess=="complete_original":
-            proc_in, proc_out = self.processors_complete_original(self.images_folder)
+        if preprocess=="scaled":
+            proc_in, proc_out = self.processors_scaled()
+        elif preprocess=="original":
+            proc_in, proc_out = self.processors_original()
+        elif preprocess=="single_card":
+            proc_in, proc_out = self.processors_single_card()
         else:
             raise ValueError
 
-        self.X, self.Y,self.header = getInputs(self.labels_file_path,proc_in,proc_out,',')
+        #pdb.set_trace()
+        self.X_meta, self.Y,self.header = getInputs(self.labels_file_path,proc_in,proc_out,',')
+
+    def get_images(self):
+        path = os.path.join(self.dataset_dir,"images_norm",self.target)
+        self.X = [load_norm_img(path,x_meta[0]) for x_meta in self.X_meta]
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X,self.Y)
         header_scaled = [header[0]]+header[3:]
         saveInputs("images_norm/"+target+"_labels_scaled.csv",X_scaled,Y_scaled,header_scaled,',')
 
-    def processors_basic_original(self,target_dir):
-        process_in_basic  = lambda row:[row[0],*[int(r) for r in row[1:3]]]
-        process_out_basic = lambda row:[row[3]]+[int(r) for r in row[4:]]
-        return process_in_basic,process_out_basic
+    def processors_single_card(self):
+        return self.processors_scaled()
 
-    def processors_complete_original(self,target_dir):
-        process_in_mat  = lambda row:load_norm_img(target_dir,row[0])
+    def processors_original(self):
+        process_in = lambda row:row[0:3]
         label_to_num = {
                 "king":0,
                 "queen":1,
                 "jack":2,
                 "nine":3,
                 "ten":4,
-                "ace":5,
+                "ace":5
         }
         n = len(label_to_num)
         enc = lambda label:[int(i==label_to_num[label]) for i in range(n,-1,-1)]
-        process_out_one_hot = lambda row:enc(row[3])+[int(r) for r in row[4:]]
-        
-        return process_in_mat,process_out_one_hot
-    
-    def processors_basic(self,target_dir):
-        process_in_basic  = lambda row:[row[0]]
-        process_out_basic = lambda row:[row[1]]+[int(r) for r in row[2:]]
-        return process_in_basic,process_out_basic
+        process_out = lambda row:enc(row[3])+[int(r) for r in row[4:]]
+        return process_in,process_out
 
-    def processors_complete(self,target_dir):
-        process_in_mat  = lambda row:load_norm_img(target_dir,row[0])
+    def processors_scaled(self):
+        process_in  = lambda row:row[0]
         label_to_num = {
                 "king":0,
                 "queen":1,
                 "jack":2,
                 "nine":3,
                 "ten":4,
-                "ace":5,
+                "ace":5
         }
         n = len(label_to_num)
         enc = lambda label:[int(i==label_to_num[label]) for i in range(n,-1,-1)]
-        process_out_one_hot = lambda row:enc(row[1])+[int(r) for r in row[2:]]
+        process_out = lambda row:enc(row[1])+[int(r) for r in row[2:]]
         
-        return process_in_mat,process_out_one_hot
+        return process_in,process_out
 
     def analiseSamples(self):
         """ Print Histogram for the output varable"""

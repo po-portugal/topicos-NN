@@ -14,25 +14,21 @@ def get_args():
     parser.add_argument(
         "--image-dir",
         required=False,
-        default="./images_norm/")
+        default="./datasets/")
     parser.add_argument(
         "--preprocess",
         required=False,
-        default="basic")
+        default="single_card")
 
     return parser.parse_args()
 
 def main():
     args = get_args()
 
-    #X_train, Y_train = Dataset(args.image_dir,"train",preprocess=args.preprocess).get_input_output()
-    #X_test,  Y_test  = Dataset(args.image_dir,"test", preprocess=args.preprocess).get_input_output()
-
     train = Dataset(args.image_dir,"train",preprocess=args.preprocess)
     test  = Dataset(args.image_dir,"test", preprocess=args.preprocess)
 
-    train.save_single_card_dataset()
-    test.save_single_card_dataset()
+    train.get_images()
 
     pdb.set_trace()
 
