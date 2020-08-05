@@ -19,16 +19,35 @@ def get_args():
         "--preprocess",
         required=False,
         default="single_card")
+    parser.add_argument(
+        "--use_enc",
+        required=False,
+        action="store_true")
 
     return parser.parse_args()
 
 def main():
     args = get_args()
 
-    train = Dataset(args.data_dir,"train",preprocess=args.preprocess)
-    test  = Dataset(args.data_dir,"test", preprocess=args.preprocess)
+    
+    label_to_num = {
+            "0.0":-1,
+            "king":0,
+            "queen":1,
+            "jack":2,
+            "nine":3,
+            "ten":4,
+            "ace":5
+    } if args.use_enc else []
 
-    train.get_images()
+    train = Dataset(args.data_dir,"train",label_to_num,preprocess=args.preprocess)
+    test  = Dataset(args.data_dir,"test", label_to_num,preprocess=args.preprocess)
+
+    #train.save_yolo_pos_version(2,2)
+    #test.save_yolo_pos_version(2,2)
+    #train.save_yolo_full_version(2,2)
+    #test.save_yolo_full_version(2,2)
+    #train.get_images()
     pdb.set_trace()
 
 if("__main__" == __name__):
