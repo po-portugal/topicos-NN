@@ -8,8 +8,10 @@ import os
 
 class Dataset():
     def __init__(self,path_to_dir,target,preprocess="basic"):
-        self.labels_file   = os.path.join(path_to_dir,target+"_labels.csv")
-        self.images_folder = os.path.join(path_to_dir,target)
+        self.dataset_dir  = path_to_dir
+        self.target       = target
+        self.labels_file_path   = os.path.join(self.dataset_dir,self.target+"_labels.csv")
+        self.images_folder = os.path.join(self.dataset_dir,target)
 
         if preprocess=="basic":
             proc_in, proc_out = self.processors_basic(self.images_folder)
@@ -22,7 +24,7 @@ class Dataset():
         else:
             raise ValueError
 
-        self.X, self.Y,header = getInputs(self.labels_file,proc_in,proc_out,',')
+        self.X, self.Y,self.header = getInputs(self.labels_file_path,proc_in,proc_out,',')
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X,self.Y)
@@ -75,7 +77,7 @@ class Dataset():
         """ Print Histogram for the output varable"""
         n,bins,patches = plt.hist(x=self.Y,bins=20,density=False,align='left')
     
-        plt.title("Hitograma do número de bicicletas")
+        #plt.title("Hitograma do número de bicicletas")
         #plt.axis([0, 10, 0, 1])
         plt.grid(True)
         plt.ylabel("frequência")
@@ -84,6 +86,15 @@ class Dataset():
 
     def get_input_output(self):
         return self.X, self.Y
+
+    def save_single_card_dataset(self):
+        names = [x[0] for x in self.X]
+        nums  = [names.count(name) for name in names]
+        X_save = [ x for x,num in zip(self.X,nums) if num==1 ]
+        Y_save = [ y for y,num in zip(self.Y,nums) if num==1 ]
+        path_to_new_dataset = os.path.join(self.dataset_dir,self.target+"_single_card_labels.csv")
+        pdb.set_trace()
+        saveInputs(path_to_new_dataset,X_save,Y_save,self.header,',')
 
 
 def scale_boundaries(X,Y):
