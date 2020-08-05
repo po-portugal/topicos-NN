@@ -118,12 +118,11 @@ class Dataset():
 
     def processors_scaled(self):
         process_in  = lambda row:row[0]
-        process_out = lambda row:[row[1]]+[int(r) for r in row[2:]]
+        process_out = lambda row:self.enc(row[1])+[int(r) for r in row[2:]]
         return process_in,process_out
 
     def processors_yolo_pos(self):
         process_in  = lambda row:row[0]
-        #process_out = lambda row:self.enc(row[1])+[int(r) for r in row[2:]]
         process_out = lambda row:[self.enc(r) for r in row[1:]]
         return process_in,process_out
 
