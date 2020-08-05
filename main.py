@@ -12,7 +12,7 @@ def get_args():
         required=False,
         action="store_true")
     parser.add_argument(
-        "--image-dir",
+        "--data-dir",
         required=False,
         default="./datasets/")
     parser.add_argument(
@@ -25,11 +25,10 @@ def get_args():
 def main():
     args = get_args()
 
-    train = Dataset(args.image_dir,"train",preprocess=args.preprocess)
-    test  = Dataset(args.image_dir,"test", preprocess=args.preprocess)
+    train = Dataset(args.data_dir,"train",preprocess=args.preprocess)
+    test  = Dataset(args.data_dir,"test", preprocess=args.preprocess)
 
     train.get_images()
-
     pdb.set_trace()
 
 if("__main__" == __name__):

@@ -27,7 +27,7 @@ class Dataset():
 
     def get_images(self):
         path = os.path.join(self.dataset_dir,"images_norm",self.target)
-        self.X = [load_norm_img(path,x_meta[0]) for x_meta in self.X_meta]
+        self.X = [load_norm_img(path,x_meta) for x_meta in self.X_meta]
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X,self.Y)
