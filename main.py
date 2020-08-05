@@ -48,7 +48,7 @@ def main():
     #train.save_yolo_full_version(2,2)
     #test.save_yolo_full_version(2,2)
     #train.get_images()
-    pdb.set_trace()
+    print(train.Y[0])
 
 if("__main__" == __name__):
     main()
