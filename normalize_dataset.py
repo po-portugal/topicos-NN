@@ -8,8 +8,8 @@ import os
 
 targets = ["test","train"]
 for tgt in targets:
-    img_dir = "./images/"+tgt+"/"
-    img_norm_dir = "./images_norm/"+tgt+"/"
+    img_dir = "./datasets/images/"+tgt+"/"
+    img_norm_dir = "./datasets/images_norm/"+tgt+"/"
     for img_file in os.listdir(img_dir):
         path = os.path.join(img_dir,img_file)
         base_name, ext = img_file.split('.')
