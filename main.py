@@ -60,7 +60,7 @@ def main():
     # print(np.shape(train.X))
     ######################### Keras #########################
     train_x = train.X
-    train_y = train.Y
+    train_y = np.array(train.Y)
 
     input_shape = train_x.shape[1:]
     num_class = train_y.shape[1]
