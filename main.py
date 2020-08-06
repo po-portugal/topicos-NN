@@ -46,8 +46,8 @@ def main():
                     preprocess=args.preprocess)
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
-    np.savetxt('train.csv', train, delimiter=',')
-    np.savetxt('test.csv', test, delimiter=',')
+    np.savetxt('trainX.csv', train.X, delimiter=',')
+    np.savetxt('testX.csv', test.X, delimiter=',')
 
     # train.save_yolo_pos_version(2,2)
     # test.save_yolo_pos_version(2,2)
