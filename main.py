@@ -48,14 +48,14 @@ def main():
                    preprocess=args.preprocess)
     #np.savetxt('trainX.csv', train.X, delimiter=',')
     #np.savetxt('testX.csv', test.X, delimiter=',')
-    print(train.X[0, 1])
+    print(train.X[1])
 
     # train.save_yolo_pos_version(2,2)
     # test.save_yolo_pos_version(2,2)
     # train.save_yolo_full_version(2,2)
     # test.save_yolo_full_version(2,2)
     # train.get_images()
-    print('Y0', train.Y[0])
+    # print(train.Y[0])
 
 
 if("__main__" == __name__):
