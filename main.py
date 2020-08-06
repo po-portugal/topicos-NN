@@ -62,6 +62,10 @@ def main():
     train_x = train.X
     train_y = np.array(train.Y)
 
+    train_xshape = list(train_x.shape)
+    train_xshape.append(1)
+    train_x = train_x.reshape(train_xshape)
+
     input_shape = train_x.shape[1:]
     num_class = train_y.shape[1]
 
