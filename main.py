@@ -1,9 +1,13 @@
-#! /usr/bin/python3
-
 import argparse
 from dataset import Dataset
 import pdb
 import numpy as np
+from sklearn import datasets
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from keras import Sequential
+from keras import layers
+import tensorflow as tf
 
 
 def get_args():
@@ -47,20 +51,43 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
+    # train.save_yolo_pos_version(2,2)
+    # test.save_yolo_pos_version(2,2)
+    # train.save_yolo_full_version(2,2)
+    # test.save_yolo_full_version(2,2)
     train.get_images()
     test.get_images()
-    train_x = []
-    index = 0
-    while index < len(train.X):
-        train_x.append(index)
-        train_x.append(train.X[index])
-        train_x.append(1)
-        index += 1
-    train_x = np.array(train_x)
-    import ipdb
-    ipdb.set_trace()
-    print(np.shape(train_x))
-    # print(np.shape(train_x))
+    # print(np.shape(train.X))
+    ######################### Keras #########################
+    train_x = train.X
+    train_y = train.Y
+
+    input_shape = train_x.shape[1:]
+    num_class = train_y.shape[1]
+
+    batch_size = 64
+    epochs = 5
+    k = 3
+
+    model = Sequential()
+    model.add(layers.Conv2D(
+        32, (k, k), activation='relu', input_shape=input_shape))
+    model.add(layers.MaxPooling2D(2, 2))
+    model.add(layers.Conv2D(64, (k, k), activation='relu'))
+    model.add(layers.MaxPooling2D(2, 2))
+
+    model.add(layers.Flatten())
+
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(num_class, activation='softmax'))
+
+    model.compile(optimizer='adam', loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    history = model.fit(train_x, train_y, epochs=epochs,
+                        batch_size=batch_size, verbose=1)
+
+    model.summary()
 
 
 if("__main__" == __name__):
