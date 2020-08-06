@@ -75,11 +75,11 @@ def main():
 
     input_shape = train_x.shape[1:]
     num_class = train_y.shape[1]
-    import ipdb
-    ipdb.set_trace()
+    #import ipdb
+    # ipdb.set_trace()
 
     batch_size = 64
-    epochs = 5
+    epochs = 10
     k = 3
 
     model = Sequential()
@@ -97,18 +97,18 @@ def main():
     model.compile(optimizer='adam', loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    history = model.fit(train_x, train_y[:6], epochs=epochs,
+    history = model.fit(train_x, train_y[:, :6], epochs=epochs,
                         batch_size=batch_size, verbose=1)
 
     model.summary()
 
     model.save("TiagoVr1.h5")
 
-    socore_train = model.evaluate(train_x, train_y[:6], verbose=0)
+    socore_train = model.evaluate(train_x, train_y[:, :6], verbose=0)
     print('Train loss: ', socore_train[0])
     print('Train acurracy: ', socore_train[1])
 
-    socore_validation = model.evaluate(test_x, test_y[:6], verbose=0)
+    socore_validation = model.evaluate(test_x, test_y[:, :6], verbose=0)
     print('Test loss: ', socore_validation[0])
     print('Test acurracy: ', socore_validation[1])
 
