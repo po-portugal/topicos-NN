@@ -62,9 +62,16 @@ def main():
     train_x = train.X
     train_y = np.array(train.Y)
 
+    test_x = test.X
+    test_y = np.array(test.Y)
+
     train_xshape = list(train_x.shape)
     train_xshape.append(1)
     train_x = train_x.reshape(train_xshape)
+
+    test_xshape = list(test_x.shape)
+    test_xshape.append(1)
+    test_x = test_x.reshape(test_xshape)
 
     input_shape = train_x.shape[1:]
     num_class = train_y.shape[1]
@@ -92,6 +99,16 @@ def main():
                         batch_size=batch_size, verbose=1)
 
     model.summary()
+
+    model.save("Tiago.h5")
+
+    socore_train = model.evaluate(train_x, train_y, verbose=0)
+    print('Trai loss: ', socore_train[0])
+    print('Trai acurracy: ', socore_train[1])
+
+    socore_validation = model.evaluate(test_x, test_y, verbose=0)
+    print('Test loss: ', socore_validation[0])
+    print('Test acurracy: ', socore_validation[1])
 
 
 if("__main__" == __name__):
