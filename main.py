@@ -38,11 +38,11 @@ def main():
 
     label_to_num = {
         "0.0": -1,
-        "king": 0,
-        "queen": 1,
+        "nine": 0,
+        "ten": 1,
         "jack": 2,
-        "nine": 3,
-        "ten": 4,
+        "queen": 3,
+        "king": 4,
         "ace": 5
     } if args.use_enc else []
 
@@ -75,6 +75,8 @@ def main():
 
     input_shape = train_x.shape[1:]
     num_class = train_y.shape[1]
+    import ipdb
+    ipdb.set_trace()
 
     batch_size = 64
     epochs = 5
@@ -90,23 +92,23 @@ def main():
     model.add(layers.Flatten())
 
     model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(num_class, activation='softmax'))
+    model.add(layers.Dense(6, activation='softmax'))
 
     model.compile(optimizer='adam', loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    history = model.fit(train_x, train_y, epochs=epochs,
+    history = model.fit(train_x, train_y[:6], epochs=epochs,
                         batch_size=batch_size, verbose=1)
 
     model.summary()
 
-    model.save("Tiago.h5")
+    model.save("TiagoVr1.h5")
 
-    socore_train = model.evaluate(train_x, train_y, verbose=0)
-    print('Trai loss: ', socore_train[0])
-    print('Trai acurracy: ', socore_train[1])
+    socore_train = model.evaluate(train_x, train_y[:6], verbose=0)
+    print('Train loss: ', socore_train[0])
+    print('Train acurracy: ', socore_train[1])
 
-    socore_validation = model.evaluate(test_x, test_y, verbose=0)
+    socore_validation = model.evaluate(test_x, test_y[:6], verbose=0)
     print('Test loss: ', socore_validation[0])
     print('Test acurracy: ', socore_validation[1])
 
