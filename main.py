@@ -3,6 +3,8 @@
 import argparse
 from dataset import Dataset
 import pdb
+import numpy as np
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="Main Script for CNN project")
@@ -26,30 +28,34 @@ def get_args():
 
     return parser.parse_args()
 
+
 def main():
     args = get_args()
 
-    
     label_to_num = {
-            "0.0":-1,
-            "king":0,
-            "queen":1,
-            "jack":2,
-            "nine":3,
-            "ten":4,
-            "ace":5
+        "0.0": -1,
+        "king": 0,
+        "queen": 1,
+        "jack": 2,
+        "nine": 3,
+        "ten": 4,
+        "ace": 5
     } if args.use_enc else []
 
-    train = Dataset(args.data_dir,"train",label_to_num,preprocess=args.preprocess)
-    test  = Dataset(args.data_dir,"test", label_to_num,preprocess=args.preprocess)
+    train = Dataset(args.data_dir, "train", label_to_num,
+                    preprocess=args.preprocess)
+    test = Dataset(args.data_dir, "test", label_to_num,
+                   preprocess=args.preprocess)
+    np.savetxt('train.csv', train, delimiter=',')
+    np.savetxt('test.csv', test, delimiter=',')
 
-    #train.save_yolo_pos_version(2,2)
-    #test.save_yolo_pos_version(2,2)
-    #train.save_yolo_full_version(2,2)
-    #test.save_yolo_full_version(2,2)
-    #train.get_images()
+    # train.save_yolo_pos_version(2,2)
+    # test.save_yolo_pos_version(2,2)
+    # train.save_yolo_full_version(2,2)
+    # test.save_yolo_full_version(2,2)
+    # train.get_images()
     print(train.Y[0])
+
 
 if("__main__" == __name__):
     main()
-
