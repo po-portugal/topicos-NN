@@ -46,16 +46,8 @@ def main():
                     preprocess=args.preprocess)
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
-    #np.savetxt('trainX.csv', train.X, delimiter=',')
-    #np.savetxt('testX.csv', test.X, delimiter=',')
-    print(train)
 
-    # train.save_yolo_pos_version(2,2)
-    # test.save_yolo_pos_version(2,2)
-    # train.save_yolo_full_version(2,2)
-    # test.save_yolo_full_version(2,2)
-    # train.get_images()
-    # print(train.Y[0])
+    print(np.shape(train.X))
 
 
 if("__main__" == __name__):
