@@ -47,7 +47,20 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
-    print(np.shape(train.X))
+    train.get_images()
+    test.get_images()
+    train_x = []
+    index = 0
+    while index < len(train.X):
+        train_x.append(index)
+        train_x.append(train.X[index])
+        train_x.append(1)
+        index += 1
+    train_x = np.array(train_x)
+    import ipdb
+    ipdb.set_trace()
+    print(np.shape(train_x))
+    # print(np.shape(train_x))
 
 
 if("__main__" == __name__):
