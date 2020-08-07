@@ -74,7 +74,7 @@ def main():
     test_x = test_x.reshape(test_xshape)
 
     input_shape = train_x.shape[1:]
-    num_class = train_y.shape[1]
+    num_class = train_y.shape[:]
     #import ipdb
     # ipdb.set_trace()
 
@@ -91,38 +91,35 @@ def main():
     Conv5X5 = layers.Conv2D(6, (5, 5), activation='relu',
                             padding='same')(input_shape)
     concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
-    conv1 = Model(input_shape, concatted)
-    model.add(conv1)
-
-    model.add(layers.MaxPooling2D(2, 2))
-    model.add(layers.Conv2D(16, (k, k), activation='relu'))
-    model.add(layers.MaxPooling2D(2, 2))
-    model.add(layers.Conv2D(32, (k, k), activation='relu'))
-    model.add(layers.MaxPooling2D(2, 2))
-    model.add(layers.Conv2D(64, (k, k), activation='relu'))
-    model.add(layers.MaxPooling2D(2, 2))
-
-    model.add(layers.Flatten())
-    model.add(layers.Dense(32, activation='relu'))
-    model.add(layers.Dense(6, activation='softmax'))
+    Max1 = layers.MaxPooling2D(2, 2)(concatted)
+    Conv1 = layers.Conv2D(16, (k, k), activation='relu')(Max1)
+    Max2 = layers.MaxPooling2D(2, 2)(Conv1)
+    flaten = layers.Flatten()(Max2)
+    final1 = layers.Dense(32, activation='relu')(flaten)
+    classe = layers.Dense(6, activation='softmax')(final1)
+    local = layers.Dense(4, activation='linear')(final1)
+    Saida = tf.keras.layers.concatenate([classe, local])
+    model = Model(input_shape, Saida)
 
     model.compile(optimizer='adam', loss='categorical_crossentropy',
                   metrics=['accuracy'])
 
-    history = model.fit(train_x, train_y[:, :6], epochs=epochs,
+    history = model.fit(train_x, train_y[:], epochs=epochs,
                         batch_size=batch_size, verbose=1)
 
     model.summary()
 
     model.save("TiagoVr1.h5")
 
-    socore_train = model.evaluate(train_x, train_y[:, :6], verbose=0)
+    socore_train = model.evaluate(train_x, train_y[:], verbose=0)
     print('Train loss: ', socore_train[0])
     print('Train acurracy: ', socore_train[1])
 
-    socore_validation = model.evaluate(test_x, test_y[:, :6], verbose=0)
+    socore_validation = model.evaluate(test_x, test_y[:], verbose=0)
     print('Test loss: ', socore_validation[0])
     print('Test acurracy: ', socore_validation[1])
+    dot_img_file = 'model_1.png'
+    tf.keras.utils.plot_model(model, to_file=dot_img_file, show_shapes=True)
 
 
 if("__main__" == __name__):
