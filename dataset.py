@@ -18,7 +18,7 @@ class Dataset():
         self.images_folder = os.path.join(self.dataset_dir, target)
 
         n = len(self.label_to_num) - 1
-        if n:
+        if n > 0:
             def one_hot_enc(label):
                 return [int(i == self.label_to_num[label]) for i in range(n-1, -1, -1)]
             self.enc = one_hot_enc
@@ -38,19 +38,18 @@ class Dataset():
         else:
             raise ValueError
 
-        # pdb.set_trace()
         self.X_meta, self.Y, self.header = getInputs(
             self.labels_file_path, proc_in, proc_out, ',')
 
     def get_images(self):
         path = os.path.join(self.dataset_dir, "images_norm", self.target)
-        self.X = np.array([load_norm_img(path, x_meta)
+        self.X = np.array([load_norm_img(path, x_meta[0])
                            for x_meta in self.X_meta])
 
     def save_scaled_version(self):
-        X_scaled, Y_scaled = scale_boundaries(self.X, self.Y)
-        header_scaled = [header[0]]+header[3:]
-        saveInputs(self.dataset_dir+"/scaled_"+target+"_labels.csv",
+        X_scaled, Y_scaled = scale_boundaries(self.X_meta, self.Y)
+        header_scaled = [self.header[0]]+self.header[3:]
+        saveInputs(self.dataset_dir+"/scaled_"+self.target+"_labels.csv",
                    X_scaled, Y_scaled, header_scaled, ',')
 
     def save_yolo_pos_version(self, grid_size_x, grid_size_y):
@@ -70,10 +69,11 @@ class Dataset():
         step_x = int(res_x/grid_size_x)
         step_y = int(res_y/grid_size_y)
 
+        names = [x[0] for x in self.X_meta]
         Y_yolo, X_yolo = [], []
         Y_array = np.array(self.Y, dtype=object)
-        X_array = np.array(self.X_meta, dtype=str)
-        X_set = set(self.X_meta)
+        X_array = np.array(names, dtype=str)
+        X_set = set(names)
         for name in X_set:
             img_labels = Y_array[X_array == name]
             label_yolo = np.zeros((grid_size_x, grid_size_y)).tolist()
@@ -96,10 +96,11 @@ class Dataset():
         upper_corner = np.array([[[int(i*step_x), int(j*step_y)]
                                   for i in range(grid_size_x)] for j in range(grid_size_y)])
 
+        names = [x[0] for x in self.X_meta]
         Y_yolo, X_yolo = [], []
         Y_array = np.array(self.Y, dtype=object)
-        X_array = np.array(self.X_meta, dtype=str)
-        X_set = set(self.X_meta)
+        X_array = np.array(names, dtype=str)
+        X_set = set(names)
         for name in X_set:
             img_labels = Y_array[X_array == name]
             label_yolo = np.zeros(
@@ -124,22 +125,23 @@ class Dataset():
         return self.processors_scaled()
 
     def processors_original(self):
-        def process_in(row): return row[0:3]
-        def process_out(row): return self.enc(row[3])+[int(r) for r in row[4:]]
+        def process_in(row): return [row[0]]+ [int(r) for r in row[1:3]]
+        def process_out(row): 
+            return self.enc(row[3])+[int(r) for r in row[4:]]
         return process_in, process_out
 
     def processors_scaled(self):
-        def process_in(row): return row[0]
+        def process_in(row): return [row[0]]
         def process_out(row): return self.enc(row[1])+[int(r) for r in row[2:]]
         return process_in, process_out
 
     def processors_yolo_pos(self):
-        def process_in(row): return row[0]
+        def process_in(row): return [row[0]]
         def process_out(row): return [self.enc(r) for r in row[1:]]
         return process_in, process_out
 
     def processors_yolo_full(self):
-        def process_in(row): return row[0]
+        def process_in(row): return [row[0]]
 
         def process_out(row):
             n = int((len(row)-1)/5)
@@ -164,9 +166,9 @@ class Dataset():
         return self.X, self.Y
 
     def save_single_card_dataset(self):
-        names = [x[0] for x in self.X]
+        names = [x[0] for x in self.X_meta]
         nums = [names.count(name) for name in names]
-        X_save = [x for x, num in zip(self.X, nums) if num == 1]
+        X_save = [x for x, num in zip(self.X_meta, nums) if num == 1]
         Y_save = [y for y, num in zip(self.Y, nums) if num == 1]
         path_to_new_dataset = os.path.join(
             self.dataset_dir, "single_card_"+self.target+"_labels.csv")
