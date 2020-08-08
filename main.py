@@ -1,5 +1,6 @@
 import pdb
 import numpy
+import numpy as np
 from dataset import Dataset
 from model import build_model
 from args import get_args
@@ -31,6 +32,9 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
+    train.set_labels_slice(slice(0,6))
+    test.set_labels_slice(slice(0,6))
+
     train.get_images()
     test.get_images()
 
@@ -39,7 +43,7 @@ def main():
         train.print_check()
         test.print_check()
 
-    model = build_model(args,train)
+    model,history = build_model(args,train)
 
     model.save(args.model_name)
     if args.print_results:

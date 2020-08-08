@@ -6,10 +6,11 @@ import tensorflow as tf
 
 def build_model(args,train):
     
-    input_shape = train.X.shape
+    input_shape = train.X.shape[1:]
     model = Sequential()
+  
 
-    if args.model == "yolo":
+    if args.model_name == "yolo":
         input_shape = Input(shape=(input_shape[0], input_shape[1], 1))
         Conv1X1 = layers.Conv2D(
             6,
@@ -41,7 +42,7 @@ def build_model(args,train):
                 loss=['categorical_crossentropy', 'mean_squared_error'],
                 metrics=[['accuracy'], ['mse']])
     
-    elif args.model == "classifier":
+    elif args.model_name == "classifier":
         model.add(layers.Conv2D(
             32,
             (3, 3),
@@ -62,7 +63,7 @@ def build_model(args,train):
             metrics=['accuracy'])
 
     else:
-        raise ValueError("%s is not valid model name"%args.model)
+        raise ValueError("%s is not valid model name"%args.model_name)
 
     history = model.fit(
         train.X,

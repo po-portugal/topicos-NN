@@ -27,10 +27,8 @@ class Dataset():
             proc_in, proc_out = self.processors_scaled()
         elif preprocess == "original":
             proc_in, proc_out = self.processors_original()
-        elif preprocess == "single_card_class":
-            proc_in, proc_out = self.processors_single_card_class()
-        elif preprocess == "single_card_pos":
-            proc_in, proc_out = self.processors_single_card_pos()
+        elif preprocess == "single_card":
+            proc_in, proc_out = self.processors_single_card()
         elif preprocess == "yolo_full":
             proc_in, proc_out = self.processors_yolo_full()
         elif preprocess == "yolo_pos":
@@ -135,12 +133,7 @@ class Dataset():
         def process_out(row): return self.enc(row[1])+[float(r) for r in row[2:]]
         return process_in, process_out
 
-    def processors_single_card_class(self):
-        def process_in(row): return [row[0]]
-        def process_out(row): return self.enc(row[1])
-        return process_in, process_out
-
-    def processors_single_card_pos(self):
+    def processors_single_card(self):
         return self.processors_scaled()
 
     def processors_yolo_pos(self):
@@ -173,6 +166,9 @@ class Dataset():
     def get_input_output(self):
         return self.X, self.Y
 
+    def set_labels_slice(self,label_slice):
+        self.Y = self.Y[:,label_slice]
+
     def save_single_card_dataset(self):
         names = [x[0] for x in self.X_meta]
         nums = [names.count(name) for name in names]
@@ -183,7 +179,7 @@ class Dataset():
         saveInputs(path_to_new_dataset, X_save, Y_save, self.header, ',')
 
     def print_check(self):
-        index = np.random.randint()
+        index = np.random.randint(len(self.X_meta))
         print("Print check for ",self.target)
         print("Input file ", self.X_meta[index])
         print("Input image ", self.X[index])
@@ -210,7 +206,7 @@ def getInputs(path, preprocess_in, preprocess_out, delim):
         for row in csvFd:
             X.append(preprocess_in(row))
             Y.append(preprocess_out(row))
-    return X, np.arry(Y), header
+    return X, np.array(Y), header
 
 
 def saveInputs(path, X, Y, header, delim):
