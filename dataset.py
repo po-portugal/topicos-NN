@@ -1,7 +1,5 @@
-from sklearn.model_selection import train_test_split
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
 import pdb
 import csv
 import os
@@ -17,7 +15,7 @@ class Dataset():
             self.dataset_dir, preprocess+"_"+self.target+"_labels.csv")
         self.images_folder = os.path.join(self.dataset_dir, target)
 
-        n = len(self.label_to_num) - 1
+        n = len(self.label_to_num)-1
         if n > 0:
             def one_hot_enc(label):
                 return [int(i == self.label_to_num[label]) for i in range(n-1, -1, -1)]
@@ -29,8 +27,10 @@ class Dataset():
             proc_in, proc_out = self.processors_scaled()
         elif preprocess == "original":
             proc_in, proc_out = self.processors_original()
-        elif preprocess == "single_card":
-            proc_in, proc_out = self.processors_single_card()
+        elif preprocess == "single_card_class":
+            proc_in, proc_out = self.processors_single_card_class()
+        elif preprocess == "single_card_pos":
+            proc_in, proc_out = self.processors_single_card_pos()
         elif preprocess == "yolo_full":
             proc_in, proc_out = self.processors_yolo_full()
         elif preprocess == "yolo_pos":
@@ -45,6 +45,9 @@ class Dataset():
         path = os.path.join(self.dataset_dir, "images_norm", self.target)
         self.X = np.array([load_norm_img(path, x_meta[0])
                            for x_meta in self.X_meta])
+
+        shape = list(self.X.shape)+[1]
+        self.X = self.X.reshape(shape)
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X_meta, self.Y)
@@ -121,9 +124,6 @@ class Dataset():
 
         return X_yolo, Y_yolo
 
-    def processors_single_card(self):
-        return self.processors_scaled()
-
     def processors_original(self):
         def process_in(row): return [row[0]]+ [int(r) for r in row[1:3]]
         def process_out(row): 
@@ -134,6 +134,13 @@ class Dataset():
         def process_in(row): return [row[0]]
         def process_out(row): return self.enc(row[1])+[float(r) for r in row[2:]]
         return process_in, process_out
+
+    def processors_single_card_class(self):
+        def process_in(row): return [row[0]]
+        def process_out(row): return self.enc(row[1])
+
+    def processors_single_card_pos(self):
+        return self.processors_scaled()
 
     def processors_yolo_pos(self):
         def process_in(row): return [row[0]]
@@ -174,6 +181,13 @@ class Dataset():
             self.dataset_dir, "single_card_"+self.target+"_labels.csv")
         saveInputs(path_to_new_dataset, X_save, Y_save, self.header, ',')
 
+    def print_check(self):
+        index = np.random.randint()
+        print("Print check for ",self.target)
+        print("Input file ", self.X_meta[index])
+        print("Input image ", self.X[index])
+        print("Label ", self.Y[index])
+
 
 def scale_boundaries(X, Y):
     X_scaled, Y_scaled = [], []
@@ -195,7 +209,7 @@ def getInputs(path, preprocess_in, preprocess_out, delim):
         for row in csvFd:
             X.append(preprocess_in(row))
             Y.append(preprocess_out(row))
-    return X, Y, header
+    return X, np.arry(Y), header
 
 
 def saveInputs(path, X, Y, header, delim):
@@ -206,22 +220,7 @@ def saveInputs(path, X, Y, header, delim):
             csvFd.writerow(x+y)
     return
 
-
 def load_norm_img(folder, filename):
     base_name, _ = filename.split('.')
     path_to_file = os.path.join(folder, base_name+".npy")
     return np.load(path_to_file)
-
-
-def _scale_x(original,x_scale):
-    return _scale(original, x_scale, 378)
-
-
-def _scale_y(original,y_scale):
-    return _scale(original, y_scale, 504)
-
-
-def _scale(original, original_dim, scaled_dim):
-    scaling_factor = scaled_dim/original_dim
-    rescaled = original*scaling_factor
-    return int(rescaled)

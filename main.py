@@ -1,37 +1,17 @@
-import argparse
-from dataset import Dataset
 import pdb
-import numpy as np
-from sklearn import datasets
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
-from keras import Sequential
-from keras import layers
-import tensorflow as tf
+import numpy
+from dataset import Dataset
+from model import build_model
+from args import get_args
 
+def print_model_results(args,train,test,model):
+    if args.verbose:
+        model.summary()
+    score_train = model.evaluate(train.X, train.Y, verbose=args.verbose)
+    print('Train loss/accuracy: ', score_train)
 
-def get_args():
-    parser = argparse.ArgumentParser(description="Main Script for CNN project")
-
-    parser.add_argument(
-        "--colab",
-        required=False,
-        action="store_true")
-    parser.add_argument(
-        "--data-dir",
-        required=False,
-        default="./datasets/")
-    parser.add_argument(
-        "--preprocess",
-        required=False,
-        default="single_card")
-    parser.add_argument(
-        "--use_enc",
-        required=False,
-        action="store_true")
-
-    return parser.parse_args()
-
+    score_test = model.evaluate(test.X, test.Y, verbose=args.verbose)
+    print('Test loss/accuracy: ', score_test)
 
 def main():
     args = get_args()
@@ -51,67 +31,19 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
-    # train.save_yolo_pos_version(2,2)
-    # test.save_yolo_pos_version(2,2)
-    # train.save_yolo_full_version(2,2)
-    # test.save_yolo_full_version(2,2)
     train.get_images()
     test.get_images()
-    # print(np.shape(train.X))
-    ######################### Keras #########################
-    train_x = train.X
-    train_y = np.array(train.Y)
 
-    test_x = test.X
-    test_y = np.array(test.Y)
+    if args.check_dataset:
+        np.random.seed(args.seed)
+        train.print_check()
+        test.print_check()
 
-    train_xshape = list(train_x.shape)
-    train_xshape.append(1)
-    train_x = train_x.reshape(train_xshape)
+    model = build_model(args,train)
 
-    test_xshape = list(test_x.shape)
-    test_xshape.append(1)
-    test_x = test_x.reshape(test_xshape)
-
-    input_shape = train_x.shape[1:]
-    num_class = train_y.shape[1]
-    #import ipdb
-    # ipdb.set_trace()
-
-    batch_size = 64
-    epochs = 10
-    k = 3
-
-    model = Sequential()
-    model.add(layers.Conv2D(
-        32, (k, k), activation='relu', input_shape=input_shape))
-    model.add(layers.MaxPooling2D(2, 2))
-    model.add(layers.Conv2D(64, (k, k), activation='relu'))
-    model.add(layers.MaxPooling2D(2, 2))
-
-    model.add(layers.Flatten())
-
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(6, activation='softmax'))
-
-    model.compile(optimizer='adam', loss='categorical_crossentropy',
-                  metrics=['accuracy'])
-
-    history = model.fit(train_x, train_y[:, :6], epochs=epochs,
-                        batch_size=batch_size, verbose=1)
-
-    model.summary()
-
-    model.save("TiagoVr1.h5")
-
-    socore_train = model.evaluate(train_x, train_y[:, :6], verbose=0)
-    print('Train loss: ', socore_train[0])
-    print('Train acurracy: ', socore_train[1])
-
-    socore_validation = model.evaluate(test_x, test_y[:, :6], verbose=0)
-    print('Test loss: ', socore_validation[0])
-    print('Test acurracy: ', socore_validation[1])
-
+    model.save(args.model_name)
+    if args.print_results:
+        print_model_results(args,train,test,model)
 
 if("__main__" == __name__):
     main()
