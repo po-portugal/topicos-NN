@@ -132,7 +132,7 @@ class Dataset():
 
     def processors_scaled(self):
         def process_in(row): return [row[0]]
-        def process_out(row): return self.enc(row[1])+[int(r) for r in row[2:]]
+        def process_out(row): return self.enc(row[1])+[float(r) for r in row[2:]]
         return process_in, process_out
 
     def processors_yolo_pos(self):
@@ -179,11 +179,10 @@ def scale_boundaries(X, Y):
     X_scaled, Y_scaled = [], []
     for x, y in zip(X, Y):
         X_scaled.append([x[0]])
-        if x[1] == 960 and x[2] == 540:
-            y[1] = _scale_x(y[1])
-            y[3] = _scale_x(y[3])
-            y[2] = _scale_y(y[2])
-            y[4] = _scale_y(y[4])
+        y[1] = float(y[1]/x[1])
+        y[3] = float(y[3]/x[1])
+        y[2] = float(y[2]/x[2])
+        y[4] = float(y[4]/x[2])
         Y_scaled.append(y)
     return X_scaled, Y_scaled
 
@@ -214,12 +213,12 @@ def load_norm_img(folder, filename):
     return np.load(path_to_file)
 
 
-def _scale_x(original):
-    return _scale(original, 960, 378)
+def _scale_x(original,x_scale):
+    return _scale(original, x_scale, 378)
 
 
-def _scale_y(original):
-    return _scale(original, 540, 504)
+def _scale_y(original,y_scale):
+    return _scale(original, y_scale, 504)
 
 
 def _scale(original, original_dim, scaled_dim):
