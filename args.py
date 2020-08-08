@@ -43,6 +43,10 @@ def get_args():
         "--use_enc",
         required=False,
         action="store_true")
+    parser.add_argument(
+        "--check_dataset",
+        required=False,
+        action="store_true")
 
     return parser.parse_args()
 
