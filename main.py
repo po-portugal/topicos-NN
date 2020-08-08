@@ -5,7 +5,8 @@ from dataset import Dataset
 from model import build_model
 from args import get_args
 
-def print_model_results(args,train,test,model):
+
+def print_model_results(args, train, test, model):
     if args.verbose:
         model.summary()
     score_train = model.evaluate(train.X, train.Y, verbose=args.verbose)
@@ -13,6 +14,7 @@ def print_model_results(args,train,test,model):
 
     score_test = model.evaluate(test.X, test.Y, verbose=args.verbose)
     print('Test loss/accuracy: ', score_test)
+
 
 def main():
     args = get_args()
@@ -32,8 +34,8 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
-    train.set_labels_slice(slice(0,6))
-    test.set_labels_slice(slice(0,6))
+    train.set_labels_slice(slice(0, 10))
+    test.set_labels_slice(slice(0, 10))
 
     train.get_images()
     test.get_images()
@@ -43,11 +45,12 @@ def main():
         train.print_check()
         test.print_check()
 
-    model,history = build_model(args,train)
+    model, history = build_model(args, train)
 
     model.save(args.model_name)
     if args.print_results:
-        print_model_results(args,train,test,model)
+        print_model_results(args, train, test, model)
+
 
 if("__main__" == __name__):
     main()
