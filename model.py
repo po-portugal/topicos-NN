@@ -62,7 +62,7 @@ def build_model(args,train):
             metrics=['accuracy'])
 
     else:
-        raise ValueError, "%s is not valid model name"%args.model
+        raise ValueError("%s is not valid model name"%args.model)
 
     history = model.fit(
         train.X,
