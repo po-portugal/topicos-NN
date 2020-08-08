@@ -98,28 +98,33 @@ def main():
     final1 = layers.Dense(32, activation='relu')(flaten)
     classe = layers.Dense(6, activation='softmax')(final1)
     local = layers.Dense(4, activation='linear')(final1)
-    Saida = tf.keras.layers.concatenate([classe, local])
-    model = Model(input_shape, Saida)
+    #Saida = tf.keras.layers.concatenate([classe, local])
+    #model = Model(input_shape, Saida)
+    model = Model(input_shape, [classe, local])
 
-    model.compile(optimizer='adam', loss='categorical_crossentropy',
-                  metrics=['accuracy'])
+    model.compile(optimizer='adam', loss=['categorical_crossentropy', 'mean_squared_error'],
+                  metrics=[['accuracy'], ['mse']])
 
-    history = model.fit(train_x, train_y[:], epochs=epochs,
+    history = model.fit(train_x, [train_y[:, :6], train_y[:, 6:]], epochs=epochs,
                         batch_size=batch_size, verbose=1)
 
     model.summary()
 
     model.save("TiagoVr1.h5")
 
-    socore_train = model.evaluate(train_x, train_y[:], verbose=0)
-    print('Train loss: ', socore_train[0])
-    print('Train acurracy: ', socore_train[1])
+    socore_train = model.evaluate(
+        train_x, [train_y[:, :6], train_y[:, 6:]], verbose=0)
+    print('Train vector: ', socore_train)
+    #print('Train acurracy: ', socore_train[1])
 
-    socore_validation = model.evaluate(test_x, test_y[:], verbose=0)
-    print('Test loss: ', socore_validation[0])
-    print('Test acurracy: ', socore_validation[1])
+    socore_validation = model.evaluate(
+        test_x, [test_y[:, :6], test_y[:, 6:]], verbose=0)
+    print('Test vector: ', socore_validation)
+    #print('Test acurracy: ', socore_validation[1])
     dot_img_file = 'model_1.png'
     tf.keras.utils.plot_model(model, to_file=dot_img_file, show_shapes=True)
+
+    # print(model.predict(test_x[:]))
 
 
 if("__main__" == __name__):
