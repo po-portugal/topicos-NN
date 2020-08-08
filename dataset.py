@@ -138,6 +138,7 @@ class Dataset():
     def processors_single_card_class(self):
         def process_in(row): return [row[0]]
         def process_out(row): return self.enc(row[1])
+        return process_in, process_out
 
     def processors_single_card_pos(self):
         return self.processors_scaled()
