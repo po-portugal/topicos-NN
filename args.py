@@ -9,7 +9,7 @@ def get_args():
         required=False,
         default=0)
     parser.add_argument(
-        "--batch_size",
+        "--model_name",
         type=str,
         required=False,
         default="Tiago.h5")
