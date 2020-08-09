@@ -1,12 +1,16 @@
 import pdb
 import numpy as np
-from keras import Sequential
-from keras import layers
-import tensorflow as tf
 
 def build_model(args,train):
-    
+
     input_shape = train.X.shape[1:]
+    
+    import os
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    from keras import Sequential,Input,Model
+    from keras import layers
+    import tensorflow as tf
+
     model = Sequential()
   
 

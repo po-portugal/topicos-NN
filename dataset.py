@@ -166,8 +166,13 @@ class Dataset():
     def get_input_output(self):
         return self.X, self.Y
 
-    def set_labels_slice(self,label_slice):
-        self.Y = self.Y[:,label_slice]
+    def set_labels_slice(self,model_name):
+        if model_name == "yolo":
+          self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
+        elif model_name == "classifier":
+          self.Y = self.Y[:,:6]
+        else :
+          raise ValueError("model_name not valid : '",model_name,"'")
 
     def save_single_card_dataset(self):
         names = [x[0] for x in self.X_meta]
@@ -178,12 +183,18 @@ class Dataset():
             self.dataset_dir, "single_card_"+self.target+"_labels.csv")
         saveInputs(path_to_new_dataset, X_save, Y_save, self.header, ',')
 
-    def print_check(self):
+    def print_check(self,model_name):
         index = np.random.randint(len(self.X_meta))
         print("Print check for ",self.target)
         print("Input file ", self.X_meta[index])
         print("Input image ", self.X[index])
-        print("Label ", self.Y[index])
+        
+        if model_name == "yolo":
+          print("Label ", self.Y[0][index], self.Y[1][index])
+        elif model_name == "classifier":
+          print("Label ", self.Y[index])
+        else:
+          raise ValueError("model_name not found: '",model_name,"'")
 
 
 def scale_boundaries(X, Y):

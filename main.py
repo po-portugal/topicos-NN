@@ -14,9 +14,7 @@ def print_model_results(args,train,test,model):
     score_test = model.evaluate(test.X, test.Y, verbose=args.verbose)
     print('Test loss/accuracy: ', score_test)
 
-def main():
-    args = get_args()
-
+def load_dataset(args):
     label_to_num = {
         "0.0": -1,
         "nine": 0,
@@ -32,16 +30,23 @@ def main():
     test = Dataset(args.data_dir, "test", label_to_num,
                    preprocess=args.preprocess)
 
-    train.set_labels_slice(slice(0,6))
-    test.set_labels_slice(slice(0,6))
+    train.set_labels_slice(args.model_name)
+    test.set_labels_slice(args.model_name)
 
     train.get_images()
     test.get_images()
 
     if args.check_dataset:
         np.random.seed(args.seed)
-        train.print_check()
-        test.print_check()
+        train.print_check(args.model_name)
+        test.print_check(args.model_name)
+
+    return train, test
+
+def main():
+    args = get_args()
+
+    train, test = load_dataset(args)
 
     model,history = build_model(args,train)
 
