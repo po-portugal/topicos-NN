@@ -1,0 +1,26 @@
+<annotation>
+	<folder>facil3</folder>
+	<filename>scaled_20200807_122315.jpg</filename>
+	<path>C:\Users\Pedro\Desktop\cartas\single_card\facil3\scaled_20200807_122315.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>king</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>65</xmin>
+			<ymin>326</ymin>
+			<xmax>175</xmax>
+			<ymax>438</ymax>
+		</bndbox>
+	</object>
+</annotation>
