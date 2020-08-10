@@ -9,15 +9,17 @@ def test_model():
   import os
   import pdb
 
+
+
   def get_image_paths(args):
       np.random.seed(args.seed)
-      img_dir = args.data_dir+"images/train/"
+      img_dir = args.data_dir+"images/test/"
       file_list = os.listdir(img_dir)
       img_file_list = [f for f in file_list if not(f.endswith('.xml'))]
       index = np.random.randint(len(img_file_list))
       img_path = os.path.join(img_dir,img_file_list[index])
 
-      img_dir = args.data_dir+"images_norm/train/"
+      img_dir = args.data_dir+"images_norm/test/"
       base_name, _ = img_file_list[index].split('.')
       img_norm_path = os.path.join(img_dir,base_name+".npy")
 
@@ -27,10 +29,10 @@ def test_model():
       labels = ["ace","king","queen","jack","ten","nine"]
       
       if args.model_name == "yolo":
-        pred_labels,pred_pos = prediction
-        max_index = np.argmax(pred_labels)
-        pred_label = labels[max_index]
-        pred_conf  = pred_labels[0,max_index]
+        pred_pos = prediction
+        #max_index = np.argmax(pred_labels)
+        #pred_label = labels[max_index]
+        #pred_conf  = pred_labels[0,max_index]
         pred_pos = pred_pos*np.array([378,504,378,504])
         pred_pos = [int(pos) for pos in pred_pos[0]]
       if args.model_name == "classifier":
@@ -39,7 +41,7 @@ def test_model():
         pred_conf  = prediction[0,max_index] 
         pred_pos = None
       
-      return pred_label,pred_conf,pred_pos
+      return pred_pos
 
   def draw_bound_box(label,coord,box_color='m'):
     x_ul, y_ul, x_lr, y_lr = coord
@@ -68,7 +70,7 @@ def test_model():
 
   def print_results(args,img_path,test,model):
     prediction = model.predict(test) # shape required (1,504,378,1)
-    pred_label,pred_conf,pred_pos = post_process(args,prediction)
+    pred_pos = post_process(args,prediction)
     
     print("Test image : '",img_path,"'")
     plt.imshow(np.asarray(Image.open(img_path)))
@@ -94,5 +96,8 @@ def test_model():
   model = load_model(args)
 
   print_results(args,img_path,test,model)
+
+pred_label = 0
+pred_conf = 0
 
 test_model()

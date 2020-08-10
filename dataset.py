@@ -168,7 +168,9 @@ class Dataset():
     def set_labels_slice(self,model_name):
         self.Y = np.array(self.Y)
         if model_name == "yolo":
-          self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
+          #self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
+          self.Y = [ self.Y[:,6:] ]
+
         elif model_name == "classifier":
           self.Y = self.Y[:,:6]
         else :
