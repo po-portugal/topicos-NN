@@ -8,6 +8,11 @@ from args import get_args
 def print_model_results(args,train,test,model):
     if args.verbose:
         model.summary()
+
+    import tensorflow as tf
+    dot_img_file = args.model_name+'_model.png'
+    tf.keras.utils.plot_model(
+        model, to_file=dot_img_file, show_shapes=True)
     score_train = model.evaluate(train.X, train.Y, verbose=args.verbose)
     print('Train loss/accuracy: ', score_train)
 

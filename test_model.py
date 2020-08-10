@@ -47,7 +47,6 @@ def test_model():
     width_label, height_label  = 60, -20
     margin = 3
     label_color = 'w'
-    label = "ace"
 
     # Create a Rectangle patch
     box = patches.Rectangle((x_ul,y_ul),width_box,height_box,linewidth=3,edgecolor=box_color,facecolor='none')
