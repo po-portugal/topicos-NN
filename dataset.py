@@ -39,6 +39,7 @@ class Dataset():
         self.X_meta, self.Y, self.header = getInputs(
             self.labels_file_path, proc_in, proc_out, ',')
 
+
     def get_images(self):
         path = os.path.join(self.dataset_dir, "images_norm", self.target)
         self.X = np.array([load_norm_img(path, x_meta[0])
@@ -167,6 +168,7 @@ class Dataset():
         return self.X, self.Y
 
     def set_labels_slice(self,model_name):
+        self.Y = np.array(self.Y)
         if model_name == "yolo":
           self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
         elif model_name == "classifier":
@@ -217,7 +219,7 @@ def getInputs(path, preprocess_in, preprocess_out, delim):
         for row in csvFd:
             X.append(preprocess_in(row))
             Y.append(preprocess_out(row))
-    return X, np.array(Y), header
+    return X, Y, header
 
 
 def saveInputs(path, X, Y, header, delim):
