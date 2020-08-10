@@ -47,18 +47,21 @@ def build_model(args,train):
                 metrics=[['accuracy'], ['mse']])
     
     elif args.model_name == "classifier":
-        model.add(layers.Conv2D(
-            32,
-            (3, 3),
-            activation='relu',
-            input_shape=input_shape))
+        model.add(layers.Conv2D(64,(5, 5),strides=(1,1),activation='relu',input_shape=input_shape))
         model.add(layers.MaxPooling2D(2, 2))
-        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.Conv2D(64,(5, 5),strides=(1,1),activation='relu'))
         model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(32,(3, 3),strides=(1,1),activation='relu'))
+        model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(16, (3, 3),strides=(1,1),activation='relu'))
+        model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(16, (3, 3),strides=(1,1),activation='relu'))
+        model.add(layers.MaxPooling2D(4, 4))
 
         model.add(layers.Flatten())
 
-        model.add(layers.Dense(64, activation='relu'))
+        model.add(layers.Dense(16, activation='relu'))
+        model.add(layers.Dense(16, activation='relu'))
         model.add(layers.Dense(6, activation='softmax'))
 
         model.compile(
