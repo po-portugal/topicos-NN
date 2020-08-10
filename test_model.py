@@ -11,13 +11,13 @@ def test_model():
 
   def get_image_paths(args):
       np.random.seed(args.seed)
-      img_dir = args.data_dir+"images/test/"
+      img_dir = args.data_dir+"images/train/"
       file_list = os.listdir(img_dir)
       img_file_list = [f for f in file_list if not(f.endswith('.xml'))]
       index = np.random.randint(len(img_file_list))
       img_path = os.path.join(img_dir,img_file_list[index])
 
-      img_dir = args.data_dir+"images_norm/test/"
+      img_dir = args.data_dir+"images_norm/train/"
       base_name, _ = img_file_list[index].split('.')
       img_norm_path = os.path.join(img_dir,base_name+".npy")
 

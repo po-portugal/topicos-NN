@@ -45,8 +45,8 @@ class Dataset():
         self.X = np.array([load_norm_img(path, x_meta[0])
                            for x_meta in self.X_meta])
 
-        shape = list(self.X.shape)+[1]
-        self.X = self.X.reshape(shape)
+        #shape = list(self.X.shape)+[1]
+        #self.X = self.X.reshape(shape)
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X_meta, self.Y)

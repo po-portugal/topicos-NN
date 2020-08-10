@@ -29,7 +29,7 @@ for tgt in targets:
         base_name, ext = img_file.split('.')
         if path.endswith(".JPG") or path.endswith(".jpg"):
             print("Normalazing img ",path)
-            img = np.array(Image.open(path).convert('L'))
+            img = np.array(Image.open(path).convert('RGB'))
             #img_norm = (img-img.mean())/img.std()
             img_norm = img/255
             norm_path = os.path.join(img_norm_dir, base_name)
