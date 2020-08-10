@@ -67,9 +67,8 @@ class Dataset():
                    self.target+"_labels.csv", X, Y, header, ',')
 
     def get_yolo_pos_labels(self, grid_size_x, grid_size_y):
-        res_x, res_y = 378, 504
-        step_x = int(res_x/grid_size_x)
-        step_y = int(res_y/grid_size_y)
+        step_x = 1.0/grid_size_x
+        step_y = 1.0/grid_size_y
 
         names = [x[0] for x in self.X_meta]
         Y_yolo, X_yolo = [], []
@@ -90,12 +89,11 @@ class Dataset():
         return X_yolo, Y_yolo
 
     def get_yolo_full_labels(self, grid_size_x, grid_size_y):
-        res_x, res_y = 378, 504
-        step_x = int(res_x/grid_size_x)
-        step_y = int(res_y/grid_size_y)
+        step_x = 1.0/grid_size_x
+        step_y = 1.0/grid_size_y
         centers = [(int(step_x/2+i*step_x), int(step_y/2+j*step_y))
                    for i in range(grid_size_x-1) for j in range(grid_size_y-1)]
-        upper_corner = np.array([[[int(i*step_x), int(j*step_y)]
+        upper_corner = np.array([[[i*step_x, j*step_y]
                                   for i in range(grid_size_x)] for j in range(grid_size_y)])
 
         names = [x[0] for x in self.X_meta]
@@ -117,7 +115,7 @@ class Dataset():
                     img_center-upper_corner[grid_y_index][grid_x_index])
                 label_scaled = np.concatenate(
                     (label[:-4], [center_dist[0]/step_x, center_dist[1]/step_y, w/step_x, h/step_y])).flatten().tolist()
-                label_yolo[grid_x_index][grid_y_index] = label_scaled
+                label_yolo[grid_y_index][grid_x_index] = label_scaled
             Y_yolo.append(np.array(label_yolo).flatten().tolist())
             X_yolo.append([name])
 
