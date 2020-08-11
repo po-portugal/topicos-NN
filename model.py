@@ -16,6 +16,45 @@ def build_model(args,train):
   
     if args.model_name == "yolo":
         pass
+    elif args.model_name == "single_card_complete":
+
+        input_shape = Input(shape=(input_shape))
+        
+        Conv7X7 = layers.Conv2D(6,(7, 7),activation='relu',padding='same',name="Firts")(input_shape)
+
+        Conv1X1 = layers.Conv2D(3,(1, 1),activation='relu',padding='same')(Conv7X7)
+        Conv3X3 = layers.Conv2D(3,(3, 3),activation='relu',padding='same')(Conv7X7)
+        Conv5X5 = layers.Conv2D(3,(5, 5),activation='relu',padding='same')(Conv7X7)
+
+        concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
+
+        x = layers.MaxPooling2D((4, 4))(concatted)
+        x = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        x = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        x = layers.Conv2D(8, (3, 3), activation='relu',name="SemiFinalConv")(x)
+        x = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
+        x = layers.Conv2D(16, (3, 3), activation='relu',name="FinalConv")(x)
+        x = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
+
+        flaten = layers.Flatten()(x)
+        x = layers.Dense(16, activation='relu')(flaten)
+        x = layers.Dense(16, activation='relu')(x)
+
+        y = layers.Dense(16, activation='relu')(flaten)
+        y = layers.Dense(16, activation='relu')(y)
+        
+
+        classe = layers.Dense(6, activation='softmax')(x)
+        local  = layers.Dense(4, activation='linear')(y)
+
+        model  = Model(input_shape, [classe, local])
+    
+        model.compile(
+            optimizer='adam',
+            loss=['categorical_crossentropy', 'mean_squared_error'],
+            metrics=[['accuracy'], ['mse']])
     if args.model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
@@ -27,6 +66,7 @@ def build_model(args,train):
         Conv5X5 = layers.Conv2D(3,(5, 5),activation='relu',padding='same')(Conv7X7)
 
         concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
+
         x   = layers.MaxPooling2D((4, 4))(concatted)
         x  = layers.Conv2D(8, (3, 3), activation='relu')(x)
         x   = layers.MaxPooling2D((2, 2))(x)
@@ -38,13 +78,9 @@ def build_model(args,train):
         x   = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
 
         flaten = layers.Flatten()(x)
-        #x = layers.Dense(16, activation='relu')(flaten)
-        #x = layers.Dense(16, activation='relu')(x)
-
         y = layers.Dense(16, activation='relu')(flaten)
         y = layers.Dense(16, activation='relu')(y)
-        
-        #classe = layers.Dense(6, activation='softmax')(x)
+
         local  = layers.Dense(4, activation='linear')(y)
 
         model  = Model(input_shape, [local])

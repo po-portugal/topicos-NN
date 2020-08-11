@@ -167,6 +167,8 @@ class Dataset():
     def set_labels_slice(self,model_name):
         self.Y = np.array(self.Y)
         if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
           self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
         elif model_name == "single_card_detector":
           self.Y = [ self.Y[:,6:] ]
@@ -191,6 +193,8 @@ class Dataset():
         print("Input image ", self.X[index])
         
         if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
           print("Label ", self.Y[0][index], self.Y[1][index])
         elif model_name == "classifier":
           print("Label ", self.Y[index])
@@ -211,6 +215,8 @@ class Dataset():
         labels = ["ace","king","queen","jack","ten","nine"]
         
         if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
           def yolo_post_processor(prediction):
             pred_label, pred_pos = prediction
             max_index = np.argmax(pred_labels)
