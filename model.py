@@ -14,8 +14,9 @@ def build_model(args,train):
 
     model = Sequential()
   
-
     if args.model_name == "yolo":
+        pass
+    if args.model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
         
