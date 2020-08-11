@@ -19,6 +19,12 @@ def build_model(args,train):
         pass
     elif args.model_name == "single_card_complete":
 
+        #tfa.layers.InstanceNormalization(axis=3, 
+        #                           center=True, 
+        #                           scale=True,
+        #                           beta_initializer="random_uniform",
+        #                           gamma_initializer="random_uniform")
+
         input_shape = Input(shape=(input_shape))
         
         Conv7X7 = layers.Conv2D(6,(7, 7),activation='relu',padding='same',name="Firts")(input_shape)
@@ -44,12 +50,12 @@ def build_model(args,train):
         x = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
 
         flaten = layers.Flatten()(x)
-        x = layers.Dense(16, activation='relu')(flaten)
+        x = layers.Dense(32, activation='relu')(flaten)
         x = layers.Dropout(0.5)(x)
         x = layers.Dense(16, activation='relu')(x)
         #x = layers.Dropout(0.2)(x)
 
-        y = layers.Dense(16, activation='relu')(flaten)
+        y = layers.Dense(32, activation='relu')(flaten)
         y = layers.Dropout(0.5)(y)
         y = layers.Dense(16, activation='relu')(y)
         #y = layers.Dropout(0.2)(y)
@@ -59,10 +65,13 @@ def build_model(args,train):
 
         model  = Model(input_shape, [classe, local])
     
+        #opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+        opt = tf.keras.optimizers.Adam()
+        metrics=[['accuracy'],[tf.keras.metrics.RootMeanSquaredError()]]
         model.compile(
-            optimizer='adam',
+            optimizer=opt,
             loss=['categorical_crossentropy', 'mean_squared_error'],
-            metrics=[['accuracy'], ['mse']])
+            metrics=metrics)
     elif args.model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
@@ -129,6 +138,7 @@ def build_model(args,train):
         train.Y,
         epochs=args.epochs,
         batch_size=args.batch_size,
-        verbose=args.verbose)
+        verbose=args.verbose,
+        validation_split=0.2)
 
     return model, history
