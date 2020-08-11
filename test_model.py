@@ -36,7 +36,7 @@ def test_model():
     return model
 
   def print_results(args,predictions,data_set):
-    for prediction, img_meta in zip(predictions,data_set.X_meta_rand):
+    for prediction, img_meta,img_label in zip(predictions,data_set.X_meta_rand,data_set.Y_rand):
       img_path = "/".join([data_set.dataset_dir,"images",data_set.target,img_meta[0]])
       pred_label, pred_conf, pred_pos = prediction
       plt.imshow(np.asarray(Image.open(img_path)))
@@ -45,6 +45,7 @@ def test_model():
       plt.show()
     
       print(args.set_dir+" image : '",img_path,"'")
+      print("Ans '",img_label)
       print("Predicted Label '",pred_label,"' with '",pred_conf,"' confidence")
       print("Predicted pos '",pred_pos,"'")
 
@@ -59,7 +60,7 @@ def test_model():
   model = load_model(args)
 
   predictions = model.predict(data_set.X_rand) # shape required (1,504,378,1)
-  predictions = [ data_set.post_process(p) for p in predictions ]
+  predictions = data_set.post_process(predictions)
 
   if args.verbose:
       model.summary()
