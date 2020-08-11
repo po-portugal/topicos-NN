@@ -55,7 +55,7 @@ def build_model(args,train):
             optimizer='adam',
             loss=['categorical_crossentropy', 'mean_squared_error'],
             metrics=[['accuracy'], ['mse']])
-    if args.model_name == "single_card_detector":
+    elif args.model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
         
