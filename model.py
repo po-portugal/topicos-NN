@@ -9,6 +9,7 @@ def build_model(args,train):
     import os
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     from keras import Sequential,Input,Model
+    from keras.layers import Dropout,BatchNormalization
     from keras import layers
     import tensorflow as tf
 
@@ -28,21 +29,29 @@ def build_model(args,train):
         concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
         x = layers.MaxPooling2D((4, 4))(concatted)
         x = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2))(x)
         x = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2))(x)
         x = layers.Conv2D(8, (3, 3), activation='relu',name="SemiFinalConv")(x)
+        #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
         x = layers.Conv2D(16, (3, 3), activation='relu',name="FinalConv")(x)
+        #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
 
         flaten = layers.Flatten()(x)
         x = layers.Dense(16, activation='relu')(flaten)
+        x = layers.Dropout(0.5)(x)
         x = layers.Dense(16, activation='relu')(x)
+        #x = layers.Dropout(0.2)(x)
 
         y = layers.Dense(16, activation='relu')(flaten)
+        y = layers.Dropout(0.5)(y)
         y = layers.Dense(16, activation='relu')(y)
-        
+        #y = layers.Dropout(0.2)(y)
+
         classe = layers.Dense(6, activation='softmax')(x)
         local  = layers.Dense(4, activation='linear')(y)
 
