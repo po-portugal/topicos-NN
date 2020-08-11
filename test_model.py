@@ -13,7 +13,7 @@ def test_model():
   def draw_bound_box(label,coord,box_color='m'):
     x_ul, y_ul, x_lr, y_lr = coord
     width_box, height_box  = x_lr-x_ul, y_lr-y_ul
-    width_label, height_label  = 60, -20
+    width_label, height_label  = 70, -20
     margin = 3
     label_color = 'w'
 

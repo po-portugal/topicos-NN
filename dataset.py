@@ -210,7 +210,8 @@ class Dataset():
       self.X_meta_rand = [ self.X_meta[i] for i in index]
       self.Y_rand = [self.Y[i] for i in index]
       self.X_rand = np.array([load_norm_img(path,name[0]) for name in self.X_meta_rand])
-      #test = test.reshape([1]+list(test.shape)+[1])
+      #self.X_rand = [load_norm_img(path,name[0]) for name in self.X_meta_rand]
+      #test = test.reshape([1]+list(test.shape))
 
     def get_post_processor(self,model_name):
         labels = ["ace","king","queen","jack","ten","nine"]
