@@ -1,11 +1,7 @@
 import pdb
 import numpy as np
 
-def build_model(args,train):
-
-    input_shape = train.X.shape[1:]
-    print(input_shape)
-    
+def build_model(model_name,input_shape):  
     import os
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     from keras import Sequential,Input,Model
@@ -15,9 +11,9 @@ def build_model(args,train):
 
     model = Sequential()
   
-    if args.model_name == "yolo":
+    if model_name == "yolo":
         pass
-    elif args.model_name == "single_card_complete":
+    elif model_name == "single_card_complete":
 
         #tfa.layers.InstanceNormalization(axis=3, 
         #                           center=True, 
@@ -25,39 +21,36 @@ def build_model(args,train):
         #                           beta_initializer="random_uniform",
         #                           gamma_initializer="random_uniform")
 
-        input_shape = Input(shape=(input_shape))
+        input_shape = Input(shape=(input_shape),name="Inputs")
         
-        Conv7X7 = layers.Conv2D(3,(7, 7),activation='relu',padding='same',name="Firts")(input_shape)
+        Conv7X7 = layers.Conv2D(5,(7, 7),strides=(4,4),activation='relu',padding='same',name="Conv7x7x3")(input_shape)
 
-        Conv1X1 = layers.Conv2D(6,(1, 1),activation='relu',padding='same')(Conv7X7)
-        Conv3X3 = layers.Conv2D(6,(3, 3),activation='relu',padding='same')(Conv7X7)
-        Conv5X5 = layers.Conv2D(6,(5, 5),activation='relu',padding='same')(Conv7X7)
+        Conv1X1 = layers.Conv2D(5,(1, 1),strides=(2,2),activation='relu',padding='same',name="Conv1x1x3")(Conv7X7)
+        Conv3X3 = layers.Conv2D(5,(3, 3),strides=(2,2),activation='relu',padding='same',name="Conv3x3x3")(Conv7X7)
+        Conv5X5 = layers.Conv2D(5,(5, 5),strides=(2,2),activation='relu',padding='same',name="Conv5x5x3")(Conv7X7)
 
         concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
 
-        x = layers.MaxPooling2D((4, 4))(concatted)
+        x = layers.MaxPooling2D((2, 2),name="Maxpool1_4x4")(concatted)
+        x = layers.Conv2D(7, (3, 3), activation='relu',name="Conv3x3x5")(x)
+        #x = layers.BatchNormalization(axis=-1)(x)
+        x = layers.MaxPooling2D((2, 2),name="Maxpool2_4x4")(x)
         x = layers.Conv2D(10, (3, 3), activation='relu')(x)
         #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2))(x)
-        x = layers.Conv2D(14, (3, 3), activation='relu')(x)
+        x = layers.MaxPooling2D((2, 2),name="Maxpool3_2x2")(x)
+        x = layers.Conv2D(12, (3, 3), activation='relu',name="Conve3x3x10")(x)
         #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2))(x)
-        x = layers.Conv2D(18, (3, 3), activation='relu',name="SemiFinalConv")(x)
-        #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
-        x = layers.Conv2D(36, (3, 3), activation='relu',name="FinalConv")(x)
-        #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
+        x = layers.MaxPooling2D((2, 2),name="Maxpool4_2x2")(x)
 
         flaten = layers.Flatten()(x)
         x = layers.Dense(20, activation='relu')(flaten)
         x = layers.Dropout(0.5)(x)
-        x = layers.Dense(16, activation='relu')(x)
+        x = layers.Dense(8, activation='relu')(x)
         #x = layers.Dropout(0.2)(x)
 
         y = layers.Dense(20, activation='relu')(flaten)
         y = layers.Dropout(0.5)(y)
-        y = layers.Dense(16, activation='relu')(y)
+        y = layers.Dense(12, activation='relu')(y)
         #y = layers.Dropout(0.2)(y)
 
         classe = layers.Dense(6, activation='softmax')(x)
@@ -72,7 +65,7 @@ def build_model(args,train):
             optimizer=opt,
             loss=['categorical_crossentropy', 'mean_squared_error'],
             metrics=metrics)
-    elif args.model_name == "single_card_detector":
+    elif model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
         
@@ -107,7 +100,7 @@ def build_model(args,train):
                 loss=[ 'mean_squared_error'],
                 metrics=[['mse']])
     
-    elif args.model_name == "classifier":
+    elif model_name == "classifier":
         model.add(layers.Conv2D(8,(5, 5),strides=(2,2),activation='relu',input_shape=input_shape))
         model.add(layers.MaxPooling2D(2, 2))
         model.add(layers.Conv2D(16,(5, 5),strides=(2,2),activation='relu'))
@@ -131,14 +124,6 @@ def build_model(args,train):
             metrics=['accuracy'])
 
     else:
-        raise ValueError("%s is not valid model name"%args.model_name)
+        raise ValueError("%s is not valid model name"%model_name)
 
-    history = model.fit(
-        train.X,
-        train.Y,
-        epochs=args.epochs,
-        batch_size=args.batch_size,
-        verbose=args.verbose,
-        validation_split=0.2)
-
-    return model, history
+    return model

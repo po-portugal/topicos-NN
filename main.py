@@ -53,7 +53,17 @@ def main():
 
     train, test = load_dataset(args)
 
-    model,history = build_model(args,train)
+    input_shape = train.X.shape[1:]
+    model = build_model(args.model_name,input_shape)
+    history = model.fit(
+        train.X,
+        train.Y,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        verbose=args.verbose,
+        validation_split=0.2,
+        workers=4,
+        use_multiprocessing=True)
 
     model.save(args.model_name)
     if args.print_results:
