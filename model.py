@@ -1,13 +1,14 @@
 import pdb
 import numpy as np
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+from keras import Sequential,Input,Model
+from keras.layers import Dropout,BatchNormalization
+from keras import layers
+import tensorflow as tf
 
 def build_model(model_name,input_shape):  
-    import os
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-    from keras import Sequential,Input,Model
-    from keras.layers import Dropout,BatchNormalization
-    from keras import layers
-    import tensorflow as tf
+    
 
     model = Sequential()
   
@@ -32,13 +33,13 @@ def build_model(model_name,input_shape):
         concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
 
         x = layers.MaxPooling2D((2, 2),name="Maxpool1_4x4")(concatted)
-        x = layers.Conv2D(7, (3, 3), activation='relu',name="Conv3x3x5")(x)
+        x = layers.Conv2D(20, (3, 3), activation='relu',name="Conv3x3x5")(x)
         #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2),name="Maxpool2_4x4")(x)
-        x = layers.Conv2D(10, (3, 3), activation='relu')(x)
+        x = layers.Conv2D(25, (3, 3), activation='relu')(x)
         #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2),name="Maxpool3_2x2")(x)
-        x = layers.Conv2D(12, (3, 3), activation='relu',name="Conve3x3x10")(x)
+        x = layers.Conv2D(30, (3, 3), activation='relu',name="Conve3x3x10")(x)
         #x = layers.BatchNormalization(axis=-1)(x)
         x = layers.MaxPooling2D((2, 2),name="Maxpool4_2x2")(x)
 
@@ -127,3 +128,19 @@ def build_model(model_name,input_shape):
         raise ValueError("%s is not valid model name"%model_name)
 
     return model
+
+def build_and_fit_model(args,train):
+  input_shape = train.X.shape[1:]
+  model = build_model(args.model_name,input_shape)
+  callbacks = [tf.keras.callbacks.TensorBoard(log_dir="logs/train.log",histogram_freq=1)]
+  history = model.fit(
+    train.X,
+    train.Y,
+    epochs=args.epochs,
+    batch_size=args.batch_size,
+    verbose=args.verbose,
+    validation_split=0.2,
+    workers=4,
+    use_multiprocessing=True,
+    callbacks=callbacks)
+  return model,history
