@@ -54,14 +54,21 @@ def build_model(model_name,input_shape):
         y = layers.Dense(12, activation='relu')(y)
         #y = layers.Dropout(0.2)(y)
 
-        classe = layers.Dense(6, activation='softmax')(x)
-        local  = layers.Dense(4, activation='linear')(y)
+        classe = layers.Dense(6, activation='softmax',name="Class")(x)
+        local  = layers.Dense(4, activation='linear',name="Box")(y)
 
         model  = Model(input_shape, [classe, local])
     
         #opt = tf.keras.optimizers.Adam(learning_rate=0.01)
-        opt = tf.keras.optimizers.Adam()
-        metrics=[['accuracy'],[tf.keras.metrics.RootMeanSquaredError()]]
+        opt = tf.keras.optimizers.Adam(
+          learning_rate=0.01,
+          beta_1=0.9,
+          beta_2=0.999,
+          epsilon=1e-07,
+          amsgrad=False,
+          name="Adam",
+        )
+        metrics=[['accuracy'],[tf.keras.metrics.RootMeanSquaredError(name="rsme")]]
         model.compile(
             optimizer=opt,
             loss=['categorical_crossentropy', 'mean_squared_error'],
