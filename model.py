@@ -44,10 +44,7 @@ def build_model(model_name,input_shape):
 
         x = layers.Conv2D(21, (3, 3), activation='relu',padding='same')(x)
         x = layers.MaxPooling2D((2, 2))(x)
-        
-        x = layers.Conv2D(24,(3, 3),activation='relu',padding='same')(x)
-        x = layers.MaxPooling2D((2, 2))(x)
-        
+                
         #x = layers.BatchNormalization(axis=-1)(x)        
         # LayerNorm Layer
         #x =tf.keras.layers.LayerNormalization(axis=1 , center=True , scale=True)(x)
@@ -58,12 +55,10 @@ def build_model(model_name,input_shape):
         x = layers.Dense(18, activation='relu')(flatten)
         x = layers.Dropout(0.3)(x)
 
-        y = layers.Dense(36, activation='relu')(flatten)
-        y = layers.Dropout(0.4)(y)
         y = layers.Dense(24, activation='relu')(flatten)
-        y = layers.Dropout(0.3)(y)
+        y = layers.Dropout(0.4)(y)
         y = layers.Dense(12, activation='relu')(y)
-        #y = layers.Dropout(0.3)(y)
+        y = layers.Dropout(0.4)(y)
 
         classe = layers.Dense(6, activation='softmax',name="Class")(x)
         local  = layers.Dense(4, activation='linear',name="Box")(y)

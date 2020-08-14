@@ -56,6 +56,14 @@ def get_args():
         "--set_dir",
         required=False,
         default="test")
+    parser.add_argument(
+        "--sort",
+        required=False,
+        action="store_true")
+    parser.add_argument(
+        "--ascending",
+        required=False,
+        action="store_true")
 
     return parser.parse_args()
 
