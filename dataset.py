@@ -28,6 +28,8 @@ class Dataset():
             proc_in, proc_out = self.processors_original()
         elif preprocess == "single_card":
             proc_in, proc_out = self.processors_single_card()
+        elif preprocess == "single_card_center":
+            proc_in, proc_out = self.processors_single_card()
         elif preprocess == "yolo_full":
             proc_in, proc_out = self.processors_yolo_full()
         elif preprocess == "yolo_pos":
@@ -64,6 +66,22 @@ class Dataset():
         header = ["To implement :("]
         saveInputs(self.dataset_dir+"/yolo_full_" +
                    self.target+"_labels.csv", X, Y, header, ',')
+
+    def save_single_card_center_dataset(self):
+      names = [x[0] for x in self.X_meta]
+      res_x, res_y = self.X_meta[0][1:3]
+      nums = [names.count(name) for name in names]
+      X_single = [[x[0]] for x, num in zip(self.X_meta, nums) if num == 1]
+
+      def new_format(y):
+        center = np.mean([y[1:3],y[3:5]],axis=0)
+        width,height = (y[3]-y[1]), (y[4]-y[2])
+        return [y[0],center[0]/res_x,center[1]/res_y,width/res_x,height/res_y]
+
+      Y_single = [new_format(y) for y, num in zip(self.Y, nums) if num == 1]
+      saveInputs(
+        self.dataset_dir+"/single_card_center_"+self.target+"_labels.csv",
+        X_single, Y_single, "Header", ',')
 
     def get_yolo_pos_labels(self, grid_size_x, grid_size_y):
         step_x = 1.0/grid_size_x

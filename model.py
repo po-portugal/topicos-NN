@@ -24,44 +24,50 @@ def build_model(model_name,input_shape):
 
         input_shape = Input(shape=(input_shape),name="Inputs")
         
-        Conv7X7 = layers.Conv2D(5,(7, 7),strides=(4,4),activation='relu',padding='same',name="Conv7x7x3")(input_shape)
+        x = layers.Conv2D(3,(7, 7),activation='relu',padding='same')(input_shape)
+        x = layers.MaxPooling2D((2, 2))(x)
 
-        Conv1X1 = layers.Conv2D(5,(1, 1),strides=(2,2),activation='relu',padding='same',name="Conv1x1x3")(Conv7X7)
-        Conv3X3 = layers.Conv2D(5,(3, 3),strides=(2,2),activation='relu',padding='same',name="Conv3x3x3")(Conv7X7)
-        Conv5X5 = layers.Conv2D(5,(5, 5),strides=(2,2),activation='relu',padding='same',name="Conv5x5x3")(Conv7X7)
+        x = layers.Conv2D(6,(5, 5),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
 
-        concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
+        x = layers.Conv2D(9, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        
+        x = layers.Conv2D(12,(3, 3),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
 
-        x = layers.MaxPooling2D((2, 2),name="Maxpool1_4x4")(concatted)
-        x = layers.Conv2D(20, (3, 3), activation='relu',name="Conv3x3x5")(x)
-        #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2),name="Maxpool2_4x4")(x)
-        x = layers.Conv2D(25, (3, 3), activation='relu')(x)
-        #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2),name="Maxpool3_2x2")(x)
-        x = layers.Conv2D(30, (3, 3), activation='relu',name="Conve3x3x10")(x)
-        #x = layers.BatchNormalization(axis=-1)(x)
-        x = layers.MaxPooling2D((2, 2),name="Maxpool4_2x2")(x)
+        x = layers.Conv2D(15, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        
+        x = layers.Conv2D(18,(3, 3),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
 
-        flaten = layers.Flatten()(x)
-        x = layers.Dense(20, activation='relu')(flaten)
-        x = layers.Dropout(0.5)(x)
-        x = layers.Dense(8, activation='relu')(x)
-        #x = layers.Dropout(0.2)(x)
+        x = layers.Conv2D(21, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+                
+        #x = layers.BatchNormalization(axis=-1)(x)        
+        # LayerNorm Layer
+        #x =tf.keras.layers.LayerNormalization(axis=1 , center=True , scale=True)(x)
+        # Groupnorm Layer
+        #x = tfa.layers.GroupNormalization(axis=3)(x)
 
-        y = layers.Dense(20, activation='relu')(flaten)
-        y = layers.Dropout(0.5)(y)
+        flatten = layers.Flatten()(x)
+        x = layers.Dense(18, activation='relu')(flatten)
+        x = layers.Dropout(0.3)(x)
+
+        y = layers.Dense(24, activation='relu')(flatten)
+        y = layers.Dropout(0.4)(y)
         y = layers.Dense(12, activation='relu')(y)
-        #y = layers.Dropout(0.2)(y)
+        y = layers.Dropout(0.4)(y)
 
         classe = layers.Dense(6, activation='softmax',name="Class")(x)
         local  = layers.Dense(4, activation='linear',name="Box")(y)
 
         model  = Model(input_shape, [classe, local])
     
-        #opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+    
         opt = tf.keras.optimizers.Adam(
-          learning_rate=0.01,
+          learning_rate=0.001,
           beta_1=0.9,
           beta_2=0.999,
           epsilon=1e-07,
@@ -72,7 +78,7 @@ def build_model(model_name,input_shape):
         model.compile(
             optimizer=opt,
             loss=['categorical_crossentropy', 'mean_squared_error'],
-            metrics=metrics)
+            metrics=metrics)        
     elif model_name == "single_card_detector":
 
         input_shape = Input(shape=(input_shape))
@@ -136,9 +142,12 @@ def build_model(model_name,input_shape):
 
     return model
 
+
 def build_and_fit_model(args,train):
   input_shape = train.X.shape[1:]
   model = build_model(args.model_name,input_shape)
+  if args.verbose:
+        model.summary()
   callbacks = [tf.keras.callbacks.TensorBoard(log_dir="logs/train.log",histogram_freq=1)]
   history = model.fit(
     train.X,
@@ -151,3 +160,11 @@ def build_and_fit_model(args,train):
     use_multiprocessing=True,
     callbacks=callbacks)
   return model,history
+
+def load_model(args):
+    # Set keras verbosity
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'#'0' if args.verbose else '3'   
+    import keras as kr
+    model = kr.models.load_model(args.model_name)
+
+    return model
