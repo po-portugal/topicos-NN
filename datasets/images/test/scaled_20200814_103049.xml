@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Fotos Guto adicionais</folder>
+	<filename>20200814_103049.jpg</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\Imagens\Fotos Guto adicionais\20200814_103049.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>king</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>106</xmin>
+			<ymin>271</ymin>
+			<xmax>238</xmax>
+			<ymax>439</ymax>
+		</bndbox>
+	</object>
+</annotation>
