@@ -5,6 +5,7 @@ def test_model():
   from PIL import Image 
   import matplotlib.pyplot as plt
   from dataset import Dataset
+  from model import load_model
   
   import matplotlib.patches as patches
   import os
@@ -26,14 +27,6 @@ def test_model():
     ax.add_patch(box)
     ax.add_patch(label_box)
     plt.text(x_ul, y_ul-margin,label,color=label_color)
-
-  def load_model(args):
-    # Set keras verbosity
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'#'0' if args.verbose else '3'   
-    import keras as kr
-    model = kr.models.load_model(args.model_name)
-
-    return model
 
   def print_results(args,predictions,data_set):
     for prediction, img_meta,img_label in zip(predictions,data_set.X_meta_rand,data_set.Y_rand):
