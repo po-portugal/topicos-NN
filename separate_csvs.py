@@ -88,11 +88,12 @@ def main():
         "ace": 5
     }
 
-
+    print("Start...")
     scaled_csv(args)
     single_card_csv(args)
     yolo_pos_csv(args,(2,2))
     yolo_csv(args,label_to_num,(2,2))
+    print("...Done")
 
 if("__main__" == __name__):
     main()

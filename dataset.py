@@ -13,7 +13,6 @@ class Dataset():
 
         self.labels_file_path = os.path.join(
             self.dataset_dir, preprocess+"_"+self.target+"_labels.csv")
-        self.images_folder = os.path.join(self.dataset_dir, target)
 
         n = len(self.label_to_num)-1
         if n > 0:
@@ -45,8 +44,8 @@ class Dataset():
         self.X = np.array([load_norm_img(path, x_meta[0])
                            for x_meta in self.X_meta])
 
-        shape = list(self.X.shape)+[1]
-        self.X = self.X.reshape(shape)
+        #shape = list(self.X.shape)+[1]
+        #self.X = self.X.reshape(shape)
 
     def save_scaled_version(self):
         X_scaled, Y_scaled = scale_boundaries(self.X_meta, self.Y)
@@ -168,7 +167,11 @@ class Dataset():
     def set_labels_slice(self,model_name):
         self.Y = np.array(self.Y)
         if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
           self.Y = [ self.Y[:,:6], self.Y[:,6:] ]
+        elif model_name == "single_card_detector":
+          self.Y = [ self.Y[:,6:] ]
         elif model_name == "classifier":
           self.Y = self.Y[:,:6]
         else :
@@ -190,12 +193,66 @@ class Dataset():
         print("Input image ", self.X[index])
         
         if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
           print("Label ", self.Y[0][index], self.Y[1][index])
         elif model_name == "classifier":
+          print("Label ", self.Y[index])
+        elif model_name == "single_card_detector":
           print("Label ", self.Y[index])
         else:
           raise ValueError("model_name not found: '",model_name,"'")
 
+    def load_rand_images(self,seed,num_files):
+      path = os.path.join(self.dataset_dir, "images_norm", self.target)
+      np.random.seed(seed)
+      index = np.random.choice(len(self.X_meta),(num_files))
+      self.X_meta_rand = [ self.X_meta[i] for i in index]
+      self.Y_rand = [self.Y[i] for i in index]
+      self.X_rand = np.array([load_norm_img(path,name[0]) for name in self.X_meta_rand])
+      #self.X_rand = [load_norm_img(path,name[0]) for name in self.X_meta_rand]
+      #test = test.reshape([1]+list(test.shape))
+
+    def get_post_processor(self,model_name):
+        labels = ["ace","king","queen","jack","ten","nine"]
+        
+        if model_name == "yolo":
+            pass
+        elif model_name == "single_card_complete":
+          def single_card_complete_post_processor(predictions):
+            preds_label, preds_pos = predictions
+            post_preds = []
+            for label,pos in zip(preds_label,preds_pos):
+              max_index = np.argmax(label)
+              pred_label = labels[max_index]
+              pred_conf  = label[max_index]
+              pred_pos = pos*np.array([378,504,378,504])
+              pred_pos = [int(pos) for pos in pred_pos]
+              post_preds.append((pred_label,pred_conf,pred_pos))
+            return post_preds
+          self.post_process = single_card_complete_post_processor
+        elif model_name == "single_card_detector":
+          def single_card_detector_post_processor(predictions):
+            post_preds = []
+            for pred_pos in predictions:
+              pred_pos = pred_pos*np.array([378,504,378,504])
+              pred_pos = [int(pos) for pos in pred_pos]
+              post_preds.append((None,None,pred_pos))
+            return post_preds
+          self.post_process = single_card_detector_post_processor
+        elif model_name == "classifier":
+          def classifier_post_processor(predictions):
+            post_preds = []
+            for label in predictions:
+              max_index  = np.argmax(label)
+              pred_label = labels[max_index]
+              pred_conf  = label[max_index] 
+              post_preds.append((pred_label,pred_conf,None))
+            return post_preds
+          self.post_process = classifier_post_processor
+        else:
+          raise ValueError("Invalid value for args.model: '",args.model,"'")
+        
 
 def scale_boundaries(X, Y):
     X_scaled, Y_scaled = [], []

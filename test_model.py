@@ -4,50 +4,18 @@ def test_model():
   from args import get_args
   from PIL import Image 
   import matplotlib.pyplot as plt
+  from dataset import Dataset
   
   import matplotlib.patches as patches
   import os
   import pdb
 
-  def get_image_paths(args):
-      np.random.seed(args.seed)
-      img_dir = args.data_dir+"images/test/"
-      file_list = os.listdir(img_dir)
-      img_file_list = [f for f in file_list if not(f.endswith('.xml'))]
-      index = np.random.randint(len(img_file_list))
-      img_path = os.path.join(img_dir,img_file_list[index])
-
-      img_dir = args.data_dir+"images_norm/test/"
-      base_name, _ = img_file_list[index].split('.')
-      img_norm_path = os.path.join(img_dir,base_name+".npy")
-
-      return img_path, img_norm_path
-
-  def post_process(args,prediction):
-      labels = ["ace","king","queen","jack","ten","nine"]
-      
-      if args.model_name == "yolo":
-        pred_labels,pred_pos = prediction
-        max_index = np.argmax(pred_labels)
-        pred_label = labels[max_index]
-        pred_conf  = pred_labels[0,max_index]
-        pred_pos = pred_pos*np.array([378,504,378,504])
-        pred_pos = [int(pos) for pos in pred_pos[0]]
-      if args.model_name == "classifier":
-        max_index  = np.argmax(prediction)
-        pred_label = labels[max_index]
-        pred_conf  = prediction[0,max_index] 
-        pred_pos = None
-      
-      return pred_label,pred_conf,pred_pos
-
   def draw_bound_box(label,coord,box_color='m'):
     x_ul, y_ul, x_lr, y_lr = coord
     width_box, height_box  = x_lr-x_ul, y_lr-y_ul
-    width_label, height_label  = 60, -20
+    width_label, height_label  = 70, -20
     margin = 3
     label_color = 'w'
-    label = "ace"
 
     # Create a Rectangle patch
     box = patches.Rectangle((x_ul,y_ul),width_box,height_box,linewidth=3,edgecolor=box_color,facecolor='none')
@@ -67,33 +35,35 @@ def test_model():
 
     return model
 
-  def print_results(args,img_path,test,model):
-    prediction = model.predict(test) # shape required (1,504,378,1)
-    pred_label,pred_conf,pred_pos = post_process(args,prediction)
+  def print_results(args,predictions,data_set):
+    for prediction, img_meta,img_label in zip(predictions,data_set.X_meta_rand,data_set.Y_rand):
+      img_path = "/".join([data_set.dataset_dir,"images",data_set.target,img_meta[0]])
+      pred_label, pred_conf, pred_pos = prediction
+      plt.imshow(np.asarray(Image.open(img_path)))
+      if pred_pos is not None :
+        draw_bound_box(pred_label,pred_pos)
+      plt.show()
     
-    print("Test image : '",img_path,"'")
-    plt.imshow(np.asarray(Image.open(img_path)))
-    if pred_pos is not None :
-      draw_bound_box(pred_label,pred_pos)
-    plt.show()
-  
-    print("Predicted Label '",pred_label,"' with '",pred_conf,"' confidence")
-    print("Predicted pos '",pred_pos,"'")
+      print(args.set_dir+" image : '",img_path,"'")
+      print("Ans '",img_label)
+      print("Predicted Label '",pred_label,"' with '",pred_conf,"' confidence")
+      print("Predicted pos '",pred_pos,"'")
 
-    if args.verbose:
-      print("Predicted: ",prediction) 
-      model.summary()
-      print("Model input ",test)
 
   args = get_args()
 
-  img_path, img_norm_path = get_image_paths(args)
-
-  test = np.load(img_norm_path)
-  test = test.reshape([1]+list(test.shape)+[1])
+  data_set = Dataset(args.data_dir, args.set_dir, {},
+          preprocess=args.preprocess)
+  data_set.load_rand_images(args.seed,args.num_files)
+  data_set.get_post_processor(args.model_name)
 
   model = load_model(args)
 
-  print_results(args,img_path,test,model)
+  predictions = model.predict(data_set.X_rand) # shape required (1,504,378,1)
+  predictions = data_set.post_process(predictions)
+
+  if args.verbose:
+      model.summary()
+  print_results(args,predictions,data_set)
 
 test_model()
