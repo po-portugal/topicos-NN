@@ -20,7 +20,7 @@ def load_dataset(args):
 
     train.set_labels_slice(args.model_name)
 
-    train.get_images()
+    train.get_images(args.num_files)
 
     if args.check_dataset:
         np.random.seed(args.seed)
