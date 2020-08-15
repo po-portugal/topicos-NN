@@ -68,6 +68,11 @@ def get_args():
         type=int,
         required=False,
         default=10)
+    parser.add_argument(
+        "--num_initial_points",
+        type=int,
+        required=False,
+        default=10)
 
     # Test Model
     parser.add_argument(
