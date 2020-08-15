@@ -56,6 +56,20 @@ def get_args():
         "--set_dir",
         required=False,
         default="test")
+
+    # Tunning
+    parser.add_argument(
+        "--max_trials",
+        type=int,
+        required=False,
+        default=10)
+    parser.add_argument(
+        "--executions_per_trial",
+        type=int,
+        required=False,
+        default=10)
+
+    # Test Model
     parser.add_argument(
         "--sort",
         required=False,

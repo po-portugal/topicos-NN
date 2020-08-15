@@ -6,6 +6,7 @@ from keras import Sequential,Input,Model
 from keras.layers import Dropout,BatchNormalization
 from keras import layers
 import tensorflow as tf
+from kerastuner.tuners import RandomSearch
 
 def build_model(model_name,input_shape):  
     
@@ -143,6 +144,42 @@ def build_model(model_name,input_shape):
     return model
 
 
+def gen_build_hyper_model(args,train):
+  input_shape = train.X.shape[1:]
+  if args.model_name == "classifier" :
+    def build_hyper_model(hp):
+      model = tf.keras.Sequential()
+      model.add(layers.Conv2D(8,(5, 5),strides=(2,2),activation='relu',input_shape=input_shape))
+      model.add(layers.MaxPooling2D(2, 2))
+      model.add(layers.Conv2D(16,(5, 5),strides=(2,2),activation='relu'))
+      model.add(layers.MaxPooling2D(2, 2))
+      model.add(layers.Conv2D(32,(3, 3),strides=(1,1),activation='relu'))
+      model.add(layers.MaxPooling2D(2, 2))
+      model.add(layers.Conv2D(32, (3, 3),strides=(1,1),activation='relu'))
+      model.add(layers.MaxPooling2D(2, 2))
+      model.add(layers.Conv2D(64, (3, 3),strides=(1,1),activation='relu'))
+
+      model.add(layers.Flatten())
+
+      model.add(layers.Dense(units=hp.Int('units',
+                                          min_value=6,
+                                          max_value=30,
+                                          step=3),
+                            activation='relu'))
+          
+      model.add(layers.Dense(6, activation='softmax'))
+      model.compile(
+          optimizer=tf.keras.optimizers.Adam(
+              hp.Choice('learning_rate',
+                        values=[1e-2, 1e-3, 1e-4])),
+          loss='categorical_crossentropy',
+          metrics=['accuracy'])
+      return model
+  else :
+    raise ValueError("args.model_name invalid value '",args.model_name,"'")
+
+  return build_hyper_model
+
 def build_and_fit_model(args,train):
   input_shape = train.X.shape[1:]
   model = build_model(args.model_name,input_shape)
@@ -160,6 +197,44 @@ def build_and_fit_model(args,train):
     use_multiprocessing=True,
     callbacks=callbacks)
   return model,history
+
+def build_tuner_and_search(args,train):
+  builder = gen_build_hyper_model(args,train)
+
+  if args.model_name == "single_card_complete":
+    pass
+  elif args.model_name == "single_card_detector":
+    pass
+  elif args.model_name == "classifier":
+      objective='accuracy'
+  else:
+    raise ValueError()
+
+  tuner = RandomSearch(
+    builder,
+    objective=objective,
+    max_trials=args.max_trials,
+    executions_per_trial=args.executions_per_trial,
+    directory='./',
+    project_name='tune_'+args.model_name
+    seed=args.seed)
+
+  tuner.search_space_summary()
+
+  callbacks = [tf.keras.callbacks.TensorBoard(log_dir="logs/hyperparams.log",histogram_freq=1)]
+  tuner.search(train.X, train.Y,
+            epochs=args.epochs,
+            #validation_data=(val_x, val_y),
+            callbacks=callbacks)
+
+  print("Search end")
+
+  model = tuner.get_best_models(num_models=1)
+
+  tuner.results_summary()
+
+  return tuner, model
+
 
 def load_model(args):
     # Set keras verbosity
