@@ -216,20 +216,24 @@ def build_tuner_and_search(args,train):
     max_trials=args.max_trials,
     executions_per_trial=args.executions_per_trial,
     directory='./',
-    project_name='tune_'+args.model_name
+    project_name='tune_'+args.model_name,
+    distribution_strategy=tf.distribute.MirroredStrategy(),
     seed=args.seed)
 
   tuner.search_space_summary()
 
   callbacks = [tf.keras.callbacks.TensorBoard(log_dir="logs/hyperparams.log",histogram_freq=1)]
-  tuner.search(train.X, train.Y,
-            epochs=args.epochs,
-            #validation_data=(val_x, val_y),
-            callbacks=callbacks)
+  tuner.search(train.X,
+    train.Y,
+    epochs=args.epochs,
+    batch_size=args.batch_size,
+    verbose=args.verbose,
+    validation_split=0.2,
+    workers=4,
+    use_multiprocessing=True,
+    callbacks=callbacks)
 
-  print("Search end")
-
-  model = tuner.get_best_models(num_models=1)
+  model, = tuner.get_best_models(num_models=1)
 
   tuner.results_summary()
 

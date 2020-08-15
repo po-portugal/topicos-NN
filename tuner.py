@@ -10,7 +10,7 @@ def main():
 
     train = load_dataset(args)
 
-    model = build_tuner_and_search(args,train)
+    tuner, model = build_tuner_and_search(args,train)
 
     model.save(args.model_name)
 
