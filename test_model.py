@@ -17,11 +17,11 @@ def test_model():
       #rmse = np.sqrt(np.sum((data_set.Y_rand[:,6:] - predictions[0][:,6:])**2,axis=-1))
       rmse = np.sqrt(np.sum((data_set.Y_rand_arr - predictions[1][:,:6])**2,axis=-1))
       criteria_l = rmse
-    elif arg.model_name == "single_card_detector":
+    elif args.model_name == "single_card_detector":
       data_set.Y_rand_arr = np.array([y[1:] for y in data_set.Y_rand])
-      rmse = np.sqrt(np.sum((data_set.Y_rand - predictions[:,:6])**2,axis=-1))
+      rmse = np.sqrt(np.sum((data_set.Y_rand_arr - predictions[:,:6])**2,axis=-1))
       criteria_l = rmse
-    elif arg.model_name == "classifier":
+    elif args.model_name == "classifier":
       pass
     else:
       raise ValueError("args.sort not recognized '",args.sort,"'")
@@ -31,8 +31,9 @@ def test_model():
 
     index = np.argsort(criteria_l)
     criteria_l = criteria_l[index]
-    predictions[0] = predictions[0][index]
-    predictions[1] = predictions[1][index]
+    predictions = predictions[index]
+    #predictions[0] = predictions[0][index]
+    #predictions[1] = predictions[1][index]
     data_set.X_meta_rand  = [data_set.X_meta_rand[i] for i in index]
     data_set.Y_rand  = [data_set.Y_rand[i] for i in index]
 
