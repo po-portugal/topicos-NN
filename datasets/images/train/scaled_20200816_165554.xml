@@ -1,0 +1,26 @@
+<annotation>
+	<folder>fotos2</folder>
+	<filename>scaled_20200816_165554.jpg</filename>
+	<path>C:\Users\Pedro\Desktop\cartas\single_card\facil mais novo\fotos2\scaled_20200816_165554.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>nine</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>37</xmin>
+			<ymin>165</ymin>
+			<xmax>332</xmax>
+			<ymax>375</ymax>
+		</bndbox>
+	</object>
+</annotation>
