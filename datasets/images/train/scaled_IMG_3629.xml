@@ -1,0 +1,26 @@
+<annotation>
+	<folder>train</folder>
+	<filename>scaled_IMG_3629.JPG</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\topicos-NN\datasets\images_novo_dataset\train\scaled_IMG_3629.JPG</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>king</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>138</xmin>
+			<ymin>175</ymin>
+			<xmax>276</xmax>
+			<ymax>364</ymax>
+		</bndbox>
+	</object>
+</annotation>

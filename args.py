@@ -47,6 +47,23 @@ def get_args():
         "--check_dataset",
         required=False,
         action="store_true")
+    parser.add_argument(
+        "--num_files",
+        type=int,
+        required=False,
+        default=1)
+    parser.add_argument(
+        "--set_dir",
+        required=False,
+        default="test")
+    parser.add_argument(
+        "--sort",
+        required=False,
+        action="store_true")
+    parser.add_argument(
+        "--ascending",
+        required=False,
+        action="store_true")
 
     return parser.parse_args()
 

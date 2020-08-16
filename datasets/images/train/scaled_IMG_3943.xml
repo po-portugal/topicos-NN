@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Novas fotos Rafa</folder>
+	<filename>scaled_IMG_3943.JPG</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\Imagens\Novas fotos Rafa\scaled_IMG_3943.JPG</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>queen</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>127</xmin>
+			<ymin>230</ymin>
+			<xmax>338</xmax>
+			<ymax>451</ymax>
+		</bndbox>
+	</object>
+</annotation>

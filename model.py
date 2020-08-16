@@ -1,109 +1,135 @@
 import pdb
 import numpy as np
-from keras import Input, Model, Sequential
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+from keras import Sequential,Input,Model
+from keras.layers import Dropout,BatchNormalization
 from keras import layers
 import tensorflow as tf
 
+def build_model(model_name,input_shape):  
+    
 
-def build_model(args, train):
-
-    input_shape = train.X.shape[1:]
     model = Sequential()
+  
+    if model_name == "yolo":
+        pass
+    elif model_name == "single_card_complete":
 
-    if args.model_name == "yolo":
-        train_x = train.X
-        train_y = np.array(train.Y)
-        train_xshape = list(train_x.shape)
-        train_xshape.append(1)
-        train_x = train_x.reshape(train_xshape)
+        #tfa.layers.InstanceNormalization(axis=3, 
+        #                           center=True, 
+        #                           scale=True,
+        #                           beta_initializer="random_uniform",
+        #                           gamma_initializer="random_uniform")
 
-        input_shape = train_x.shape[1:]
-        num_class = train_y.shape[:]
-        input_shape = Input(shape=(input_shape[0], input_shape[1], 1))
-        ##################-------------#####################
-        Conv7X7X64_1 = layers.Conv2D(64, (7, 7), strides=(2, 2), activation='relu',
-                                     padding='same')(input_shape)
-        Max_1 = layers.MaxPooling2D((2, 2), strides=(2, 2))(Conv7X7X64_1)
-        ##################-------------#####################
-        Conv3X3X192_2 = layers.Conv2D(192, (3, 3), strides=(1, 1), activation='relu',
-                                      padding='same')(Max_1)
-        Max_2 = layers.MaxPooling2D((2, 2), strides=(2, 2))(Conv3X3X192_2)
-        ##################-------------#####################
-        Conv_1_1X1_3 = layers.Conv2D(128, (1, 1), activation='relu',
-                                     padding='same')(Max_2)
-        Conv_1_3X3_3 = layers.Conv2D(256, (3, 3), activation='relu',
-                                     padding='same')(Max_2)
-        Conv_2_1X1_3 = layers.Conv2D(256, (1, 1), activation='relu',
-                                     padding='same')(Max_2)
-        Conv_2_3X3_3 = layers.Conv2D(512, (3, 3), activation='relu',
-                                     padding='same')(Max_2)
-        concatted_1 = tf.keras.layers.concatenate(
-            [Conv_1_1X1_3, Conv_1_3X3_3, Conv_2_1X1_3, Conv_2_3X3_3])
-        Max_3 = layers.MaxPooling2D((2, 2), strides=(2, 2))(concatted_1)
-        ##################-------------#####################
-        Conv_1_1X1_4 = layers.Conv2D(256, (1, 1), activation='relu',
-                                     padding='same')(Max_3)
-        Conv_1_3X3_4 = layers.Conv2D(512, (3, 3), activation='relu',
-                                     padding='same')(Max_3)
-        Conv_2_1X1_4 = layers.Conv2D(512, (1, 1), activation='relu',
-                                     padding='same')(Max_3)
-        Conv_2_3X3_4 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(Max_3)
-        concatted_2 = tf.keras.layers.concatenate(
-            [Conv_1_1X1_4, Conv_1_3X3_4, Conv_2_1X1_4, Conv_2_3X3_4])
-        Max_4 = layers.MaxPooling2D((2, 2), strides=(2, 2))(concatted_2)
-        ##################-------------#####################
-        Conv_1_1X1_5 = layers.Conv2D(512, (1, 1), activation='relu',
-                                     padding='same')(Max_4)
-        Conv_1_3X3_5 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(Max_4)
-        Conv_2_3X3_5 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(Max_4)
-        Conv_3_3X3_5 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(Max_4)
-        concatted_3 = tf.keras.layers.concatenate(
-            [Conv_1_1X1_5, Conv_1_3X3_5, Conv_2_3X3_5, Conv_3_3X3_5])
-        ##################-------------#####################
-        Conv_1_3X3_6 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(concatted_3)
-        Conv_2_3X3_6 = layers.Conv2D(1024, (3, 3), activation='relu',
-                                     padding='same')(concatted_3)
-        concatted_4 = tf.keras.layers.concatenate([Conv_1_3X3_6, Conv_2_3X3_6])
-        ##################-------------#####################
-        flaten = layers.Flatten()(concatted_4)
-        final1 = layers.Dense(30, activation='relu')(flaten)
-        ##################-------------#####################
-        classe = layers.Dense(6, activation='softmax')(final1)
-        local = layers.Dense(4, activation='linear')(final1)
-        ##################-------------#####################
+        input_shape = Input(shape=(input_shape),name="Inputs")
+        
+        x = layers.Conv2D(3,(7, 7),activation='relu',padding='same')(input_shape)
+        x = layers.MaxPooling2D((2, 2))(x)
 
-        model = Model(input_shape, [classe, local])
+        x = layers.Conv2D(6,(5, 5),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
 
+        x = layers.Conv2D(9, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        
+        x = layers.Conv2D(12,(3, 3),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+
+        x = layers.Conv2D(15, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        
+        x = layers.Conv2D(18,(3, 3),activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+
+        x = layers.Conv2D(21, (3, 3), activation='relu',padding='same')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+                
+        #x = layers.BatchNormalization(axis=-1)(x)        
+        # LayerNorm Layer
+        #x =tf.keras.layers.LayerNormalization(axis=1 , center=True , scale=True)(x)
+        # Groupnorm Layer
+        #x = tfa.layers.GroupNormalization(axis=3)(x)
+
+        flatten = layers.Flatten()(x)
+        x = layers.Dense(18, activation='relu')(flatten)
+        x = layers.Dropout(0.3)(x)
+
+        y = layers.Dense(24, activation='relu')(flatten)
+        y = layers.Dropout(0.4)(y)
+        y = layers.Dense(12, activation='relu')(y)
+        y = layers.Dropout(0.4)(y)
+
+        classe = layers.Dense(6, activation='softmax',name="Class")(x)
+        local  = layers.Dense(4, activation='linear',name="Box")(y)
+
+        model  = Model(input_shape, [classe, local])
+    
+    
+        opt = tf.keras.optimizers.Adam(
+          learning_rate=0.001,
+          beta_1=0.9,
+          beta_2=0.999,
+          epsilon=1e-07,
+          amsgrad=False,
+          name="Adam",
+        )
+        metrics=[['accuracy'],[tf.keras.metrics.RootMeanSquaredError(name="rsme")]]
         model.compile(
-            optimizer='adam',
+            optimizer=opt,
             loss=['categorical_crossentropy', 'mean_squared_error'],
-            metrics=[['accuracy'], ['mse']])
+            metrics=metrics)        
+    elif model_name == "single_card_detector":
 
-        history = model.fit(train_x, [train_y[:, :6], train_y[:, 6:]], epochs=args.epochs,
-                            batch_size=args.batch_size, verbose=1)
+        input_shape = Input(shape=(input_shape))
+        
+        Conv7X7 = layers.Conv2D(6,(7, 7),activation='relu',padding='same',name="Firts")(input_shape)
 
-        dot_img_file = 'model_1.png'
-        tf.keras.utils.plot_model(
-            model, to_file=dot_img_file, show_shapes=True)
+        Conv1X1 = layers.Conv2D(3,(1, 1),activation='relu',padding='same')(Conv7X7)
+        Conv3X3 = layers.Conv2D(3,(3, 3),activation='relu',padding='same')(Conv7X7)
+        Conv5X5 = layers.Conv2D(3,(5, 5),activation='relu',padding='same')(Conv7X7)
 
-    elif args.model_name == "classifier":
-        model.add(layers.Conv2D(
-            32,
-            (3, 3),
-            activation='relu',
-            input_shape=input_shape))
+        concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
+
+        x   = layers.MaxPooling2D((4, 4))(concatted)
+        x  = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        x   = layers.MaxPooling2D((2, 2))(x)
+        x  = layers.Conv2D(8, (3, 3), activation='relu')(x)
+        x   = layers.MaxPooling2D((2, 2))(x)
+        x  = layers.Conv2D(8, (3, 3), activation='relu',name="SemiFinalConv")(x)
+        x   = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
+        x  = layers.Conv2D(16, (3, 3), activation='relu',name="FinalConv")(x)
+        x   = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
+
+        flaten = layers.Flatten()(x)
+        y = layers.Dense(16, activation='relu')(flaten)
+        y = layers.Dense(16, activation='relu')(y)
+
+        local  = layers.Dense(4, activation='linear')(y)
+
+        model  = Model(input_shape, [local])
+    
+        model.compile(
+                optimizer='adam',
+                loss=[ 'mean_squared_error'],
+                metrics=[['mse']])
+    
+    elif model_name == "classifier":
+        model.add(layers.Conv2D(8,(5, 5),strides=(2,2),activation='relu',input_shape=input_shape))
         model.add(layers.MaxPooling2D(2, 2))
-        model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        model.add(layers.Conv2D(16,(5, 5),strides=(2,2),activation='relu'))
         model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(32,(3, 3),strides=(1,1),activation='relu'))
+        model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(32, (3, 3),strides=(1,1),activation='relu'))
+        model.add(layers.MaxPooling2D(2, 2))
+        model.add(layers.Conv2D(64, (3, 3),strides=(1,1),activation='relu'))
+        #model.add(layers.MaxPooling2D(4, 4))
 
         model.add(layers.Flatten())
 
         model.add(layers.Dense(64, activation='relu'))
+        #model.add(layers.Dense(16, activation='relu'))
         model.add(layers.Dense(6, activation='softmax'))
 
         model.compile(
@@ -111,14 +137,34 @@ def build_model(args, train):
             loss='categorical_crossentropy',
             metrics=['accuracy'])
 
-        history = model.fit(
-            train.X,
-            train.Y,
-            epochs=args.epochs,
-            batch_size=args.batch_size,
-            verbose=args.verbose)
-
     else:
-        raise ValueError("%s is not valid model name" % args.model_name)
+        raise ValueError("%s is not valid model name"%model_name)
 
-    return model, history
+    return model
+
+
+def build_and_fit_model(args,train):
+  input_shape = train.X.shape[1:]
+  model = build_model(args.model_name,input_shape)
+  if args.verbose:
+        model.summary()
+  callbacks = [tf.keras.callbacks.TensorBoard(log_dir="logs/train.log",histogram_freq=1)]
+  history = model.fit(
+    train.X,
+    train.Y,
+    epochs=args.epochs,
+    batch_size=args.batch_size,
+    verbose=args.verbose,
+    validation_split=0.2,
+    workers=4,
+    use_multiprocessing=True,
+    callbacks=callbacks)
+  return model,history
+
+def load_model(args):
+    # Set keras verbosity
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'#'0' if args.verbose else '3'   
+    import keras as kr
+    model = kr.models.load_model(args.model_name)
+
+    return model

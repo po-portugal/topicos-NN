@@ -75,6 +75,22 @@ def yolo_csv(args,label_to_num,sizes):
     train.save_yolo_full_version(*sizes)
     test.save_yolo_full_version(*sizes)
 
+def single_card_center_csv(args):
+    train = Dataset(
+        args.data_dir,
+        "train",
+        {},
+        preprocess="original")
+    test = Dataset(
+        args.data_dir,
+        "test",
+        {},
+        preprocess="original")
+
+    train.save_single_card_center_dataset()
+    test.save_single_card_center_dataset()
+
+
 def main():
     args = get_args()
 
@@ -88,11 +104,13 @@ def main():
         "ace": 5
     }
 
-
+    print("Start...")
+    single_card_center_csv(args)
     scaled_csv(args)
     single_card_csv(args)
     yolo_pos_csv(args,(2,2))
     yolo_csv(args,label_to_num,(2,2))
+    print("...Done")
 
 if("__main__" == __name__):
     main()
