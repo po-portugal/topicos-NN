@@ -154,16 +154,29 @@ def gen_build_hyper_model(args,train):
     def build_hyper_model(hp):
 
       inputs = tf.keras.Input(shape=input_shape)
-      x = inputs
-      for i in range(hp.Int('num_conv_layers', 3, 5, default=4)):
-        x = layers.Conv2D(
-          hp.Int('conv_layers_filter_'+str(i), 3+i, 5+i, default=4+i),
-          (3, 3),
-          strides=(1,1),
-          activation='relu',
-          input_shape=input_shape)(x)
-        x = layers.MaxPooling2D(2, 2)(x)
+      a = inputs
+      b = inputs
+      c = inputs
 
+      for i in range(hp.Int('num_conv_layers', 3, 5, default=4)):
+        n_a =  hp.Int('conv_layers_filter_a'+str(i), 3+i, 7+i, default=2+i)
+        n_b =  hp.Int('conv_layers_filter_b'+str(i), 1+i, 5+i, default=3+i)
+        n_c =  hp.Int('conv_layers_filter_c'+str(i), 1+i, 8+i, default=5+i)
+
+        a = layers.Conv2D(n_a, (3, 3),
+          activation='relu',padding='same')(a)
+        a = layers.MaxPooling2D((2, 2))(a)
+
+        b = layers.Conv2D(n_b, (3, 3),
+          activation='relu',padding='same')(b)
+        b = layers.MaxPooling2D((2, 2))(b)
+
+        c = layers.Conv2D(n_c, (3, 3),
+          activation='relu',padding='same')(c)
+        c = layers.MaxPooling2D((2, 2))(c)
+
+
+      x = layers.concatenate([a,b,c])    
       x = layers.Flatten()(x)
       x = layers.Dense(
         units=hp.Int('units',min_value=6,max_value=30,step=3),
