@@ -372,9 +372,15 @@ def build_and_fit_model(args,train):
     callbacks=callbacks)
   return model,history
 
-def report_tuner(args,train):
+def get_dummy():
+  def build_hyper_model(hp):
+    builder = Model()
+    return builder
+  return build_hyper_model
 
-  builder = gen_build_hyper_model(args,train)
+def report_tuner(args):
+
+  builder = get_dummy()
   tuner =  kt.BayesianOptimization(
     builder,
     'loss',
