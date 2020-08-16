@@ -44,7 +44,9 @@ class Dataset():
     def get_images(self,num_images=-1):
         path = os.path.join(self.dataset_dir, "images_norm", self.target)
         self.X = np.array([load_norm_img(path, x_meta[0])
-                           for x_meta in self.X_meta[:num_images]])
+                           for x_meta in self.X_meta])
+        #self.X_meta = self.X_meta[:num_images]
+        #self.Y = self.Y[:num_images]
 
         #shape = list(self.X.shape)+[1]
         #self.X = self.X.reshape(shape)
