@@ -186,7 +186,7 @@ def gen_build_hyper_model(args,train):
       x = inputs
       for i in range(hp.Int('num_conv_layers', 3, 5, default=4)):
         x = layers.Conv2D(
-          hp.Int('conv_layers_filter_'+str(i), 3+i, 5+i, default=4+i),
+          hp.Int('conv_layers_filter_'+str(i), 3+3*i, 10+3*i, default=4+i),
           (3, 3),
           strides=(1,1),
           activation='relu',
@@ -195,7 +195,7 @@ def gen_build_hyper_model(args,train):
 
       x = layers.Flatten()(x)
       x = layers.Dense(
-        units=hp.Int('units',min_value=6,max_value=30,step=3),
+        units=hp.Int('units',min_value=6,max_value=24,step=6),
         activation='relu')(x)
       x = layers.Dropout(hp.Float('dropout',min_value=0.2,max_value=0.5,step=0.1))(x)
         
@@ -286,7 +286,7 @@ def build_tuner_and_search(args,train):
       tensorboard_callback,
       tf.keras.callbacks.EarlyStopping(
         monitor="val_rmse",
-        min_delta=0.005,
+        min_delta=0.0025,
         patience=25,
         verbose=1,
         mode='min',
@@ -346,7 +346,7 @@ def build_tuner_and_search(args,train):
     use_multiprocessing=True,
     callbacks=callbacks)
 
-  model = tuner.get_best_models(num_models=1)
+  model, = tuner.get_best_models(num_models=1)
 
   tuner.results_summary()
 
