@@ -199,7 +199,7 @@ def gen_build_hyper_model(args,train):
         activation='relu')(x)
       x = layers.Dropout(hp.Float('dropout',min_value=0.2,max_value=0.5,step=0.1))(x)
         
-      box = layers.Dense(4, activation='linear')(x)
+      box = layers.Dense(4, activation='linear',name="box")(x)
 
       model  = Model(inputs,box)
 
@@ -207,7 +207,8 @@ def gen_build_hyper_model(args,train):
           optimizer=tf.keras.optimizers.Adam(
               hp.Choice('learning_rate',
                         values=[1e-2,1e-3,1e-4])),
-          metrics=['mean_squared_error'])
+          loss=['mean_squared_error'],
+          metrics=[tf.keras.metrics.RootMeanSquaredError(name="rmse")])
       return model
   elif args.model_name == "single_card_complete":
     inputs = tf.keras.Input(shape=input_shape)
@@ -280,12 +281,12 @@ def build_tuner_and_search(args,train):
         baseline=None,
         restore_best_weights=False)]
   elif args.model_name == "single_card_detector":
-    objective='val_rmse'
+    objective=kt.Objective("val_rmse", direction="min")
     callbacks = [
       tensorboard_callback,
       tf.keras.callbacks.EarlyStopping(
-        monitor=objective,
-        min_delta=0.01,
+        monitor="val_rmse",
+        min_delta=0.005,
         patience=25,
         verbose=1,
         mode='min',
