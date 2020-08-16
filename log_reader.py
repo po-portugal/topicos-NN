@@ -8,11 +8,9 @@ from main import load_dataset
 def main():
   args = get_args()
 
-  train = load_dataset(args)
+  model = report_tuner(args)
 
-  model = report_tuner(args,train)
-
-  model.save(args.model_name,train)
+  model.save(args.model_name)
 
 if("__main__" == __name__):
     main()
