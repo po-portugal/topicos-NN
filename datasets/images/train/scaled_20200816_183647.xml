@@ -1,13 +1,13 @@
 <annotation>
-	<folder>fotos3</folder>
+	<folder>train</folder>
 	<filename>scaled_20200816_183647.jpg</filename>
-	<path>C:\Users\Pedro\Desktop\cartas\single_card\facil mais novo\fotos3\scaled_20200816_183647.jpg</path>
+	<path>C:\Users\Pedro\Desktop\cartas\single_card\facil mais novo\train\scaled_20200816_183647.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
 	<size>
-		<width>504</width>
-		<height>378</height>
+		<width>378</width>
+		<height>504</height>
 		<depth>3</depth>
 	</size>
 	<segmented>0</segmented>
@@ -17,10 +17,10 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>299</xmin>
-			<ymin>139</ymin>
-			<xmax>424</xmax>
-			<ymax>246</ymax>
+			<xmin>133</xmin>
+			<ymin>300</ymin>
+			<xmax>239</xmax>
+			<ymax>423</ymax>
 		</bndbox>
 	</object>
 </annotation>
