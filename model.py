@@ -86,36 +86,38 @@ def build_model(model_name,input_shape):
 
         input_shape = Input(shape=(input_shape))
         
-        Conv7X7 = layers.Conv2D(6,(7, 7),activation='relu',padding='same',name="Firts")(input_shape)
+        Conv3X3 = layers.Conv2D(3,(3, 3),activation='relu',padding='same',name="Firts")(input_shape)
 
-        Conv1X1 = layers.Conv2D(3,(1, 1),activation='relu',padding='same')(Conv7X7)
-        Conv3X3 = layers.Conv2D(3,(3, 3),activation='relu',padding='same')(Conv7X7)
-        Conv5X5 = layers.Conv2D(3,(5, 5),activation='relu',padding='same')(Conv7X7)
+        #Conv1X1 = layers.Conv2D(3,(1, 1),activation='relu',padding='same')(Conv7X7)
+        #Conv3X3 = layers.Conv2D(3,(3, 3),activation='relu',padding='same')(Conv7X7)
+        #Conv5X5 = layers.Conv2D(3,(5, 5),activation='relu',padding='same')(Conv7X7)
 
-        concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
+        #concatted = tf.keras.layers.concatenate([Conv1X1, Conv3X3, Conv5X5])
 
-        x   = layers.MaxPooling2D((4, 4))(concatted)
-        x  = layers.Conv2D(8, (3, 3), activation='relu')(x)
-        x   = layers.MaxPooling2D((2, 2))(x)
-        x  = layers.Conv2D(8, (3, 3), activation='relu')(x)
-        x   = layers.MaxPooling2D((2, 2))(x)
-        x  = layers.Conv2D(8, (3, 3), activation='relu',name="SemiFinalConv")(x)
-        x   = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
-        x  = layers.Conv2D(16, (3, 3), activation='relu',name="FinalConv")(x)
-        x   = layers.MaxPooling2D((4, 4),name="FinalPooling")(x)
+        x = layers.MaxPooling2D((2, 2))(Conv3X3)
+        x = layers.Conv2D(5, (3, 3), activation='relu')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        x = layers.Conv2D(5, (3, 3), activation='relu')(x)
+        x = layers.MaxPooling2D((2, 2))(x)
+        x = layers.Conv2D(8, (3, 3), activation='relu',name="SemiFinalConv")(x)
+        x = layers.MaxPooling2D((2, 2),name="SemiFinalPooling")(x)
+        x = layers.Conv2D(8, (3, 3), activation='relu',name="FinalConv")(x)
+        x = layers.MaxPooling2D((2, 2),name="FinalPooling")(x)
 
         flaten = layers.Flatten()(x)
-        y = layers.Dense(16, activation='relu')(flaten)
-        y = layers.Dense(16, activation='relu')(y)
+        y = layers.Dense(18, activation='relu')(flaten)
+        #y = layers.Dense(16, activation='relu')(y)
+        y = layers.Dropout(0.2)(y)
 
         local  = layers.Dense(4, activation='linear')(y)
 
         model  = Model(input_shape, [local])
-    
+
+        metrics=[[tf.keras.metrics.RootMeanSquaredError(name="rsme")]]
         model.compile(
                 optimizer='adam',
                 loss=[ 'mean_squared_error'],
-                metrics=[['mse']])
+                metrics=metrics)
     
     elif model_name == "classifier":
         model.add(layers.Conv2D(8,(5, 5),strides=(2,2),activation='relu',input_shape=input_shape))
@@ -148,7 +150,7 @@ def build_model(model_name,input_shape):
 
 def gen_build_hyper_model(args,train):
   input_shape = train.X.shape[1:]
-  if args.model_name == "classifier" :
+  if args.model_name == "classifier":
     def build_hyper_model(hp):
 
       inputs = tf.keras.Input(shape=input_shape)
