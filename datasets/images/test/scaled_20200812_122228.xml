@@ -1,0 +1,26 @@
+<annotation>
+	<folder>test</folder>
+	<filename>scaled_20200812_122228.jpg</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\topicos-NN\datasets\images_novo_dataset\test\scaled_20200812_122228.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>king</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>4</xmin>
+			<ymin>335</ymin>
+			<xmax>117</xmax>
+			<ymax>497</ymax>
+		</bndbox>
+	</object>
+</annotation>

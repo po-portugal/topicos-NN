@@ -1,13 +1,13 @@
 <annotation>
-	<folder>Fotos Guto adicionais</folder>
-	<filename>20200814_103715.jpg</filename>
-	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\Imagens\Fotos Guto adicionais\20200814_103715.jpg</path>
+	<folder>train</folder>
+	<filename>scaled_20200814_103715.jpg</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\topicos-NN\datasets\images\train\scaled_20200814_103715.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
 	<size>
-		<width>504</width>
-		<height>378</height>
+		<width>378</width>
+		<height>504</height>
 		<depth>3</depth>
 	</size>
 	<segmented>0</segmented>
@@ -17,10 +17,10 @@
 		<truncated>0</truncated>
 		<difficult>0</difficult>
 		<bndbox>
-			<xmin>231</xmin>
-			<ymin>124</ymin>
-			<xmax>335</xmax>
-			<ymax>278</ymax>
+			<xmin>108</xmin>
+			<ymin>232</ymin>
+			<xmax>254</xmax>
+			<ymax>333</ymax>
 		</bndbox>
 	</object>
 </annotation>

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>train</folder>
+	<filename>scaled_20200812_121113.jpg</filename>
+	<path>C:\Users\Rafael\Documents\UFRGS\Tópicos Especiais em Instru\Trabalho Final B\topicos-NN\datasets\images_novo_dataset\train\scaled_20200812_121113.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>378</width>
+		<height>504</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>ace</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>12</xmin>
+			<ymin>6</ymin>
+			<xmax>139</xmax>
+			<ymax>172</ymax>
+		</bndbox>
+	</object>
+</annotation>
