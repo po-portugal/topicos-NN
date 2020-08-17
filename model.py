@@ -154,35 +154,45 @@ def gen_build_hyper_model(args,train):
     def build_hyper_model(hp):
 
       inputs = tf.keras.Input(shape=input_shape)
-      a = inputs
-      b = inputs
-      c = inputs
 
-      for i in range(hp.Int('num_conv_layers', 3, 5, default=4)):
-        n_a =  hp.Int('conv_layers_filter_a'+str(i), 3+i, 7+i, default=2+i)
-        n_b =  hp.Int('conv_layers_filter_b'+str(i), 1+i, 5+i, default=3+i)
-        n_c =  hp.Int('conv_layers_filter_c'+str(i), 1+i, 8+i, default=5+i)
+      #Rede A
+      a = inputs
+
+      for i_a in range(hp.Int('num_conv_layers_a', 2, 6, default=3)):
+        n_a =  hp.Int('conv_layers_filter_a'+str(i_a), i_a, 10+i_a, default=3+i_a)
 
         a = layers.Conv2D(n_a, (3, 3),
           activation='relu',padding='same')(a)
         a = layers.MaxPooling2D((2, 2))(a)
 
-        b = layers.Conv2D(n_b, (3, 3),
+      a = layers.Flatten()(a)
+
+      for j_b in range(hp.Int('num_dense_layers_a', 1, 6, default=2)):
+        a = layers.Dense(
+          units=hp.Int('units_a'+str(j_a),min_value=4,max_value=30,step=3),
+          activation='relu')(a)
+        a = layers.Dropout(hp.Float('dropout_a'+str(j_a),min_value=0.1,max_value=0.5,step=0.1))(a)
+
+      #Rede B
+      b = inputs
+
+      for i_b in range(hp.Int('num_conv_layers_b', 2, 6, default=4)):
+        n_b =  hp.Int('conv_layers_filter_b'+str(i_b), i_b, 10+i_b, default=3+i_b)
+
+        b = layers.Conv2D(n_b, (5, 5),
           activation='relu',padding='same')(b)
         b = layers.MaxPooling2D((2, 2))(b)
 
-        c = layers.Conv2D(n_c, (3, 3),
-          activation='relu',padding='same')(c)
-        c = layers.MaxPooling2D((2, 2))(c)
+      b = layers.Flatten()(b)
 
+      for j_b in range(hp.Int('num_dense_layers_b', 1, 6, default=2)):
+        b = layers.Dense(
+          units=hp.Int('units_b'+str(j_b),min_value=4,max_value=30,step=3),
+          activation='relu')(b)
+        b = layers.Dropout(hp.Float('dropou_b'+str(j_b),min_value=0.1,max_value=0.5,step=0.1))(b)
 
-      x = layers.concatenate([a,b,c])    
-      x = layers.Flatten()(x)
-      x = layers.Dense(
-        units=hp.Int('units',min_value=6,max_value=30,step=3),
-        activation='relu')(x)
-      x = layers.Dropout(hp.Float('dropout',min_value=0.2,max_value=0.5,step=0.1))(x)
-        
+      x = layers.concatenate([a,b])    
+      
       classe = layers.Dense(6, activation='softmax')(x)
 
       model  = Model(inputs,classe)
