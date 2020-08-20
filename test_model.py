@@ -48,13 +48,14 @@ def test_model():
 
     # Create a Rectangle patch
     box = patches.Rectangle((x_ul,y_ul),width_box,height_box,linewidth=3,edgecolor=box_color,facecolor='none')
-    label_box = patches.Rectangle((x_ul,y_ul),width_label,height_label,linewidth=3,edgecolor=box_color,facecolor=box_color)
-
+    if label is not None:
+      label_box = patches.Rectangle((x_ul,y_ul),width_label,height_label,linewidth=3,edgecolor=box_color,facecolor=box_color)
+      plt.text(x_ul, y_ul-margin,label,color=label_color)
+      ax.add_patch(label_box)
+      
     # Add the patch to the Axes
     ax = plt.gcf().gca()
     ax.add_patch(box)
-    ax.add_patch(label_box)
-    plt.text(x_ul, y_ul-margin,label,color=label_color)
 
   def print_results(args,predictions,data_set,criteria_l):
     for prediction, img_meta,img_label,criteria in zip(predictions,data_set.X_meta_rand,data_set.Y_rand,criteria_l):
