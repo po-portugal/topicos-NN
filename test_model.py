@@ -31,9 +31,13 @@ def test_model():
 
     index = np.argsort(criteria_l)
     criteria_l = criteria_l[index]
-    predictions = predictions[index]
-    #predictions[0] = predictions[0][index]
-    #predictions[1] = predictions[1][index]
+    if args.model_name == "single_card_detector":
+      predictions = predictions[index]
+    elif args.model_name == "single_card_complete":
+      predictions[0] = predictions[0][index]
+      predictions[1] = predictions[1][index]
+    else:
+      pass
     data_set.X_meta_rand  = [data_set.X_meta_rand[i] for i in index]
     data_set.Y_rand  = [data_set.Y_rand[i] for i in index]
 
@@ -46,6 +50,8 @@ def test_model():
     margin = 3
     label_color = 'w'
 
+    ax = plt.gcf().gca()
+
     # Create a Rectangle patch
     box = patches.Rectangle((x_ul,y_ul),width_box,height_box,linewidth=3,edgecolor=box_color,facecolor='none')
     if label is not None:
@@ -54,7 +60,7 @@ def test_model():
       ax.add_patch(label_box)
       
     # Add the patch to the Axes
-    ax = plt.gcf().gca()
+  
     ax.add_patch(box)
 
   def print_results(args,predictions,data_set,criteria_l):
